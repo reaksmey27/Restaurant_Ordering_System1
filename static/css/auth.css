@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+/* ------------------- Global Styles ------------------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0;
+}
+
+/* ------------------- Typography ------------------- */
+h1 {
+    font-weight: 800;
+}
+
+p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+}
+
+span {
+    font-size: 12px;
+}
+
+a {
+    text-decoration: none;
+    font-size: 14px;
+    color: #333;
+    margin: 15px 0;
+}
+
+/* ------------------- Button Styles ------------------- */
+button {
+    border-radius: 20px;
+    border: 1px solid #ffd333;
+    background: linear-gradient(to right, #fc6a76, #fc6a76);
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    margin-top: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 80ms ease-in, box-shadow 0.3s ease-in-out;
+}
+
+button:hover {
+    box-shadow: 0 8px 15px rgba(250, 188, 43, 0.3);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+button:focus {
+    outline: none;
+}
+
+button.ghost {
+    background-color: transparent;
+    border-color: #fff;
+}
+
+/* ------------------- Form & Input ------------------- */
+form {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: none;
+    background-color: #eee;
+    transition: background-color 0.3s;
+}
+
+input:focus {
+    background-color: #e0e0e0;
+    outline: none;
+}
+
+/* ------------------- Container ------------------- */
+.container {
+    width: 1000px;
+    max-width: 95%;
+    min-height: 650px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+/* ------------------- Sign In / Sign Up ------------------- */
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+}
+
+.sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.container.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+}
+
+.container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: show 0.6s;
+}
+
+@keyframes show {
+    0%, 49.99% { opacity: 0; z-index: 1; }
+    50%, 100% { opacity: 1; z-index: 5; }
+}
+
+/* ------------------- Overlay ------------------- */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+.container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.overlay {
+    position: relative;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background-image: url(/static/images/auth.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: #333;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.container.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+.overlay-panel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-left { transform: translateX(-20%); }
+.container.right-panel-active .overlay-left { transform: translateX(0); }
+
+.overlay-right { right: 0; transform: translateX(0); }
+.container.right-panel-active .overlay-right { transform: translateX(20%); }
+
+/* ------------------- Social Icons ------------------- */
+.social-container {
+    margin: 20px 0;
+}
+
+.social-container a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    width: 40px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    background-color: #fff;
+    transition: background-color 0.3s;
+}
+
+.social-container a i {
+    font-size: 24px;
+    color: #333;
+}
+
+.social-container a:hover { background-color: #eee; }
+
+/* ------------------- Password Reset ------------------- */
+.pss {
+    margin-left: 5px;
+    color: #fc6a76;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.pss:hover {
+    color: #fcbb60;
+    text-decoration: none;
+}
