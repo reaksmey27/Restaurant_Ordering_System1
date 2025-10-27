@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Orders YumYum</title>
+    <link rel="stylesheet" href="/static/css/order_list.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h2 class="logo"><i>🍕 YumYum</i></h2>
+                <div class="nav-links">
+                    <a href="{{ url_for('home') }}">Home</a>
+                    <a href="{{ url_for('menu') }}">Menu</a>
+                    <a href="{{ url_for('order_list') }}" class="active">Orders</a>
+                    <button id="cartBtn" class="cart-btn">
+                        🛒 Cart (<span id="cartCount">0</span>)
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Cart Popup -->
+    <aside>
+        <div id="cartPopup" class="cart-popup">
+            <div class="cart-content">
+                <h3>Your Cart</h3>
+                <table id="cartTable">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartItems"></tbody>
+                </table>
+                <button id="closeCartBtn">Close</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- main -->
+    <main>
+        <section class="header">
+            <h1>🧾 All Customer Orders</h1>
+            <p>View all customer orders made through the system.</p>
+            <a href="{{ url_for('menu') }}" class="btn-back">← Back to Menu</a>
+        </section>
+
+        <!-- Orders Table -->
+        <section class="table-container">
+            <table>
+                <!-- Updated Table Header -->
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Delivery</th>
+                        <th>Service</th>
+                        <th>Image</th>
+                        <th>Food</th>
+                        <th>Quantity</th>
+                        <th>Total ($)</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <!-- Updated Table Body -->
+                <tbody>
+                    {% if orders %}
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.order_id }}</td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.phone }}</td>
+                        <td>{{ order.address }}</td>
+                        <td>{{ order.delivery_option }}</td>
+                        <td>{{ order.delivery_service }}</td>
+                        <td><img src="{{ order.image_url }}" alt="{{ order.food_name }}" class="order-img"></td>
+                        <td>{{ order.food_name }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>${{ "%.2f"|format(order.total_price) }}</td>
+                        <td>{{ order.order_date.strftime("%Y-%m-%d %H:%M") }}</td>
+                        <td>
+                            <form action="{{ url_for('delete_order', order_id=order.order_id) }}" method="POST"
+                                style="display: inline;"
+                                onsubmit="return confirm('Are you sure you want to delete this order?');">
+                                <button type="submit" class="btn-delete">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="12" class="no-data">No orders yet 😅</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+
+    <!-- Detailed Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Logo & About -->
+                <div class="footer-section">
+                    <h3>🍕 YumYum</h3>
+                    <p>Authentic Khmer & Asian cuisine with fresh ingredients. Fast delivery, great taste, every time!
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social"><i class='bx bxl-facebook-circle'></i></a>
+                        <a href="#" class="social"><i class='bx bxl-google-plus-circle'></i></a>
+                        <a href="#" class="social"><i class='bx bxl-linkedin-square'></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{{ url_for('home') }}">🏠 Home</a></li>
+                        <li><a href="{{ url_for('menu') }}">🍽 Menu</a></li>
+                        <li><a href="{{ url_for('order_list') }}">🧾 Orders</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="#">🚚 Delivery</a></li>
+                        <li><a href="#">🏪 Dine-in</a></li>
+                        <li><a href="#">📦 Takeaway</a></li>
+                        <li><a href="#">🎉 Events</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div class="footer-section">
+                    <h4>📞 Contact Us</h4>
+                    <div class="contact-info">
+                        <p><i>📍</i> 123 Khmer Street, Phnom Penh</p>
+                        <p><i>📱</i> +855 23 123 456</p>
+                        <p><i>✉️</i> hello@yumyum.com.kh</p>
+                        <p><i>🕒</i> Open 7AM - 10PM Daily</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright & Payment -->
+            <div class="footer-bottom">
+                <div class="footer-left">
+                    <p>&copy; 2025 <strong>YumYum Restaurant</strong>. All rights reserved.</p>
+                    <p class="footer-date"><span id="currentDateTime"></span></p>
+                </div>
+                <div class="footer-right">
+                    <div class="payment-methods">
+                        <span>💳 We Accept:</span>
+                        <img src="/static/images/payment-visa.png" alt="Visa" class="payment-icon">
+                        <img src="/static/images/payment-mastercard.png" alt="Mastercard" class="payment-icon">
+                        <img src="/static/images/payment-aba.png" alt="Wing" class="payment-icon">
+                        <img src="/static/images/payment-acleda.png" alt="Cash" class="payment-icon">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>

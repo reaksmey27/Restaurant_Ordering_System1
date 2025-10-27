@@ -188,6 +188,30 @@ def apply_coupon():
         return jsonify({"success": False, "message": "Invalid coupon code."})
     
 
+# ---------------- Order List ----------------
+@app.route('/order-list')
+@login_required
+def order_list():
+    cursor = get_cursor()
+    orders = []
+    try:
+        cursor.execute("""
+            SELECT o.order_id, o.customer_name, o.phone, o.address, o.note, o.delivery_option, o.delivery_service,
+                   f.food_id, f.image_url, f.food_name, o.quantity, o.total_price, o.order_date
+            FROM orders o
+            JOIN food f ON o.food_id = f.food_id
+            ORDER BY o.order_date DESC
+        """)
+        orders = cursor.fetchall() or []
+    except Exception as e:
+        logging.exception("Failed to fetch orders: %s", e)
+        flash('Failed to load orders', 'error')
+    finally:
+        cursor.close()
+    return render_template('order_list.html', orders=orders)
+
+    
+
 
 # ---------------- Run App ----------------
 if __name__ == '__main__':
