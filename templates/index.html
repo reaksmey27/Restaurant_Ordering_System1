@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khmer Food</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h2 class="logo"><i>🍕 YumYum</i></h2>
+                <div class="nav-links">
+                    <a href="/" class="active">Home</a>
+                    <a href="/menu">Menu</a>
+                    {% if session.get('username') %}
+                    <a href="/order-list">Orders</a>
+                    <a href="/logout">Logout</a>
+                    {% else %}
+                    <a href="/auth">Sign up</a>
+                    {% endif %}
+                    <button id="cartBtn" class="cart-btn">
+                        🛒 Cart (<span id="cartCount">0</span>)
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Cart Popup -->
+    <aside>
+        <div id="cartPopup" class="cart-popup">
+            <div class="cart-content">
+                <h3>Your Cart</h3>
+                <table id="cartTable">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartItems"></tbody>
+                </table>
+                <button id="closeCartBtn">Close</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Fresh, Fast & Flavorful!</h1>
+            <p>Experience the best dishes made with passion and premium ingredients.</p>
+            <div class="hero-btns">
+                <a href="{{ url_for('menu') }}" class="btn primary">🍽 View Menu</a>
+                <a href="{{ url_for('order_list') }}" class="btn secondary">🛒 My Orders</a>
+            </div>
+        </div>
+
+        <div class="hero-img">
+            <img src="/static/images/hero.png" alt="Delicious Food">
+        </div>
+    </section>
+
+
+    <!-- Featured Items Section -->
+    <main>
+        <section class="featured">
+            <div class="container">
+                <h2>🍔 Popular Items</h2>
+
+                <!-- Food Cards Grid -->
+                <div class="menu-container">
+                    {% for food in foods %}
+                    <div class="food-card">
+                        <img src="{{ food.image_url }}" alt="{{ food.food_name }}">
+                        <div class="food-info">
+                            <h2>{{ food.food_name }}</h2>
+                            <p class="category">{{ food.category }}</p>
+                            <p class="price">
+                                {% if food.get('discounted_price') and food.discounted_price != food.price %}
+                                <span class="original-price" style="text-decoration: line-through;">${{ food.price }}</span>
+                                <span class="discounted-price">${{ food.discounted_price }}</span>
+                                {% else %}
+                                ${{ food.price }}
+                                {% endif %}
+                            </p>
+                            <a href="{{ url_for('order', food_id=food.food_id) }}">
+                                <button class="order-btn">Order Now</button>
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="no-items">No food items found 😅</p>
+                    {% endfor %}
+                </div>
+
+                <!-- View All Button -->
+                <div class="view-all">
+                    <a href="{{ url_for('menu') }}" class="cta-btn secondary">View Full Menu →</a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Quick Stats -->
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h3>🚚</h3>
+                        <p><strong>30 min</strong><br>Delivery</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>⭐</h3>
+                        <p><strong>4.9/5</strong><br>Rating</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>🍕</h3>
+                        <p><strong>500+</strong><br>Orders Daily</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Detailed Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <!-- Logo & About -->
+                <div class="footer-section">
+                    <h3>🍕 YumYum</h3>
+                    <p>Authentic Khmer & Asian cuisine with fresh ingredients. Fast delivery, great taste, every time!
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social"><i class='bx bxl-facebook-circle'></i></a>
+                        <a href="#" class="social"><i class='bx bxl-google-plus-circle'></i></a>
+                        <a href="#" class="social"><i class='bx bxl-linkedin-square'></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{{ url_for('home') }}">🏠 Home</a></li>
+                        <li><a href="{{ url_for('menu') }}">🍽 Menu</a></li>
+                        <li><a href="{{ url_for('order_list') }}">🧾 Orders</a></li>
+                    </ul>
+                </div>
+
+                <!-- Services -->
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="#">🚚 Delivery</a></li>
+                        <li><a href="#">🏪 Dine-in</a></li>
+                        <li><a href="#">📦 Takeaway</a></li>
+                        <li><a href="#">🎉 Events</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div class="footer-section">
+                    <h4>📞 Contact Us</h4>
+                    <div class="contact-info">
+                        <p><i>📍</i> 123 Khmer Street, Phnom Penh</p>
+                        <p><i>📱</i> +855 23 123 456</p>
+                        <p><i>✉️</i> hello@yumyum.com.kh</p>
+                        <p><i>🕒</i> Open 7AM - 10PM Daily</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright & Payment -->
+            <div class="footer-bottom">
+                <div class="footer-left">
+                    <p>&copy; 2025 <strong>YumYum Restaurant</strong>. All rights reserved.</p>
+                    <p class="footer-date"><span id="currentDateTime"></span></p>
+                </div>
+                <div class="footer-right">
+                    <div class="payment-methods">
+                        <span>💳 We Accept:</span>
+                        <img src="/static/images/payment-visa.png" alt="Visa" class="payment-icon">
+                        <img src="/static/images/payment-mastercard.png" alt="Mastercard" class="payment-icon">
+                        <img src="/static/images/payment-aba.png" alt="Wing" class="payment-icon">
+                        <img src="/static/images/payment-acleda.png" alt="Cash" class="payment-icon">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
