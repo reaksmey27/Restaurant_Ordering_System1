@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Successful</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/order_success.css') }}">
+</head>
+<body>
+  <section class="header">
+    <div class="delivery-icon"></div>
+    <h1>🎉 Order Confirmed!</h1>
+    <p>Your delicious food is on the way! 🚚</p>
+
+    <a href="{{ url_for('menu') }}" class="btn">Back to Menu</a>
+    <a href="{{ url_for('order_list') }}" class="btn btn-secondary">Track Order</a>
+  </section>
+</body>
+</html>
