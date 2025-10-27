@@ -118,3 +118,57 @@ def logout():
     session.pop('username', None)
     session.pop('coupon', None)
     return redirect(url_for('home'))
+
+
+# ---------------- Menu ----------------
+@app.route('/menu')
+@login_required
+def menu():
+    search = (request.args.get('search') or '').strip()
+    category = (request.args.get('category') or '').strip()
+
+    query = "SELECT * FROM food WHERE available = TRUE"
+    params = []
+
+    if search:
+        query += " AND food_name LIKE %s"
+        params.append(f"%{search}%")
+    if category:
+        query += " AND category = %s"
+        params.append(category)
+
+    cursor = get_cursor()
+    foods = []
+    categories = []
+    try:
+        cursor.execute(query, params)
+        foods = cursor.fetchall() or []
+
+        if not foods:
+            cursor.execute("SELECT * FROM food")
+            foods = cursor.fetchall() or []
+
+        coupon = session.get('coupon')
+        for food in foods:
+            try:
+                price = float(food.get('price') or 0)
+                item_disc = float(food.get('discount_percent') or 0)
+                price_after_item = price * (1 - item_disc / 100) if item_disc > 0 else price
+                if coupon:
+                    price_after = price_after_item * (1 - float(coupon.get('discount', 0)))
+                else:
+                    price_after = price_after_item
+                food['discounted_price'] = round(price_after, 2)
+            except Exception:
+                food['discounted_price'] = float(food.get('price') or 0)
+
+        # get categories
+        cursor.execute("SELECT DISTINCT category FROM food WHERE available = TRUE")
+        categories = [row['category'] for row in cursor.fetchall()] or []
+    except Exception as e:
+        logging.exception("Failed to load menu: %s", e)
+        flash('Failed to load menu', 'error')
+    finally:
+        cursor.close()
+
+    return render_template('menu.html', foods=foods, categories=categories, coupon=session.get('coupon'))
