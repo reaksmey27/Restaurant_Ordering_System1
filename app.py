@@ -210,6 +210,27 @@ def order_list():
         cursor.close()
     return render_template('order_list.html', orders=orders)
 
+
+# ---------------- Delete Order ----------------
+@app.route('/delete_order/<int:order_id>', methods=['POST'])
+@login_required
+def delete_order(order_id):
+    cursor = get_cursor(dict_cursor=False)
+    try:
+        cursor.execute("DELETE FROM orders WHERE order_id = %s", (order_id,))
+        affected = cursor.rowcount
+        mysql.connection.commit()
+        flash('Order deleted successfully!' if affected > 0 else 'Order not found!',
+              'success' if affected > 0 else 'warning')
+    except Exception as e:
+        mysql.connection.rollback()
+        logging.exception("Delete failed: %s", e)
+        flash(f'Delete failed: {str(e)}', 'error')
+    finally:
+        cursor.close()
+    return redirect(url_for('order_list'))
+
+
     
 
 
