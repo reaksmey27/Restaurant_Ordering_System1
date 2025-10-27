@@ -172,3 +172,23 @@ def menu():
         cursor.close()
 
     return render_template('menu.html', foods=foods, categories=categories, coupon=session.get('coupon'))
+
+
+# ---------------- Apply Coupon ----------------
+@app.route('/apply_coupon', methods=['POST'])
+@login_required
+def apply_coupon():
+    code = (request.form.get('coupon_code') or '').upper().strip()
+    # simple demo coupon matching
+    if code == "PNC":
+        session['coupon'] = {'code': code, 'discount': 0.2}  # 20% off
+        return jsonify({"success": True, "message": "Coupon applied! 20% off will be applied."})
+    else:
+        session.pop('coupon', None)  # remove coupon if invalid
+        return jsonify({"success": False, "message": "Invalid coupon code."})
+    
+
+
+# ---------------- Run App ----------------
+if __name__ == '__main__':
+    app.run(debug=True)
