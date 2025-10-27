@@ -52,3 +52,69 @@ def home():
         cursor.close()
 
     return render_template('index.html', current_time=current_time, foods=foods, current_page='home')
+
+
+# ---------------- Auth (Login/Register) ----------------
+@app.route('/auth', methods=['GET', 'POST'])
+def auth():
+    if request.method == 'POST':
+        action = request.form.get('action')  # 'login' or 'register'
+        username = (request.form.get('username') or '').strip()
+        password = request.form.get('password') or ''
+        email = (request.form.get('email') or '').strip()  # only for register
+
+        if action == 'login':
+            cursor = get_cursor()
+            try:
+                cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+                user = cursor.fetchone()
+            except Exception as e:
+                logging.exception("Login DB error: %s", e)
+                flash('Server error during login', 'login_error')
+                return render_template('auth.html')
+            finally:
+                cursor.close()
+
+            if user and check_password_hash(user['password'], password):
+                session['username'] = user['username']
+                # optional: session.permanent = True (set app.permanent_session_lifetime if you want)
+                return redirect(url_for('menu'))
+            else:
+                flash('Invalid username or password', 'login_error')
+
+        elif action == 'register':
+            # basic validation
+            if not username or not password or not email:
+                flash('Please fill in all fields', 'register_error')
+                return render_template('auth.html')
+
+            cursor = get_cursor()
+            try:
+                cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
+                if cursor.fetchone():
+                    flash('Username already exists', 'register_error')
+                else:
+                    hashed_password = generate_password_hash(password)
+                    cursor.execute(
+                        "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)",
+                        (username, hashed_password, email)
+                    )
+                    mysql.connection.commit()
+                    flash('Registration successful! Please login.', 'register_success')
+                    return redirect(url_for('auth'))
+            except Exception as e:
+                mysql.connection.rollback()
+                logging.exception("Registration error: %s", e)
+                flash('Registration failed due to server error', 'register_error')
+            finally:
+                cursor.close()
+
+    return render_template('auth.html')
+
+
+# ---------------- Logout ----------------
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    session.pop('coupon', None)
+    return redirect(url_for('home'))
