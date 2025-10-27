@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order {{ food.food_name }}</title>
+    <link rel="stylesheet" href="/static/css/order_form.css">
+</head>
+
+<body>
+    <section class="order-section">
+        <!-- Left: Food Image -->
+        <div class="food-image">
+            <img src="{{ food.image_url }}" alt="{{ food.food_name }}">
+        </div>
+
+        <!-- Right: Order Form -->
+        <div class="order-content">
+            <div class="header">
+                <h1>Order {{ food.food_name }}</h1>
+                <p>Price: 
+                    {% if food.get('discounted_price') and food.discounted_price != food.price %}
+                        <span style="text-decoration: line-through;">${{ food.price }}</span>
+                        <strong>${{ food.discounted_price }}</strong>
+                    {% else %}
+                        <strong>${{ food.price }}</strong>
+                    {% endif %}
+                </p>
+            </div>
+
+            <form action="{{ url_for('order', food_id=food.food_id) }}" method="post" class="order-form">
+                <input type="text" name="customer_name" placeholder="Your Name" required>
+                <input type="tel" name="phone" placeholder="Phone Number" required>
+                <input type="number" name="quantity" min="1" value="1" required>
+
+                <!-- Delivery Option -->
+                <label for="delivery_option">Delivery Method:</label>
+                <select name="delivery_option" id="delivery_option" required>
+                    <option value="delivery" selected>Delivery</option>
+                    <option value="pickup">Pickup</option>
+                </select>
+
+                <!-- Delivery Service Selection -->
+                <label for="delivery_service">Choose Delivery Service:</label>
+                <select name="delivery_service" id="delivery_service" required>
+                    <option value="" disabled selected>Select Delivery Service</option>
+                    <option value="foodpanda">Foodpanda</option>
+                    <option value="nham24">Nham24</option>
+                    <option value="wingmall">WingMall</option>
+                    <option value="tada">TADA Delivery</option>
+                    <option value="grab">Grab</option>
+                    <option value="other">Other</option>
+                </select>
+
+
+                <!-- Delivery Address -->
+                <input type="text" name="address" placeholder="Delivery Address" id="address_field" required>
+
+                <textarea name="note" placeholder="Special Requests (Optional)"></textarea>
+                <button type="submit">Confirm Order</button>
+            </form>
+        </div>
+    </section>
+</body>
+
+</html>
