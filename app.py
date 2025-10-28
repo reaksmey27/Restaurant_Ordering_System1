@@ -7,6 +7,12 @@ from datetime import datetime
 from functools import wraps
 import logging
 
+# Constants
+TEMPLATE_AUTH = 'auth.html'
+TEMPLATE_ORDER_FORM = 'order_form.html'
+ERR_SERVER = 'Server error occurred'
+ERR_LOGIN = 'Invalid username or password'
+
 # ---------------- App setup ----------------
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET') or os.urandom(24)
@@ -86,59 +92,64 @@ def home():
 
 
 # ---------------- Auth (Login/Register) ----------------
+def handle_login(username, password):
+    cursor = get_cursor()
+    try:
+        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+        if user and check_password_hash(user['password'], password):
+            session['username'] = user['username']
+            return redirect(url_for('menu'))
+        flash(ERR_LOGIN, 'login_error')
+        return render_template(TEMPLATE_AUTH)
+    except Exception as e:
+        logging.exception("Login DB error: %s", e)
+        flash(ERR_SERVER, 'login_error')
+        return render_template(TEMPLATE_AUTH)
+    finally:
+        cursor.close()
+
+def handle_registration(username, password, email):
+    if not all([username, password, email]):
+        flash('Please fill in all fields', 'register_error')
+        return render_template(TEMPLATE_AUTH)
+
+    cursor = get_cursor()
+    try:
+        cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
+        if cursor.fetchone():
+            flash('Username already exists', 'register_error')
+            return render_template(TEMPLATE_AUTH)
+        
+        hashed_password = generate_password_hash(password)
+        cursor.execute(
+            "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)",
+            (username, hashed_password, email)
+        )
+        mysql.connection.commit()
+        flash('Registration successful! Please login.', 'register_success')
+        return redirect(url_for('auth'))
+    except Exception as e:
+        mysql.connection.rollback()
+        logging.exception("Registration error: %s", e)
+        flash('Registration failed due to server error', 'register_error')
+        return render_template(TEMPLATE_AUTH)
+    finally:
+        cursor.close()
+
 @app.route('/auth', methods=['GET', 'POST'])
 def auth():
     if request.method == 'POST':
-        action = request.form.get('action')  # 'login' or 'register'
         username = (request.form.get('username') or '').strip()
         password = request.form.get('password') or ''
-        email = (request.form.get('email') or '').strip()  # only for register
-
-        if action == 'login':
-            cursor = get_cursor()
-            try:
-                cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-                user = cursor.fetchone()
-            except Exception as e:
-                logging.exception("Login DB error: %s", e)
-                flash('Server error during login', 'login_error')
-                return render_template('auth.html')
-            finally:
-                cursor.close()
-
-            if user and check_password_hash(user['password'], password):
-                session['username'] = user['username']
-                return redirect(url_for('menu'))
-            else:
-                flash('Invalid username or password', 'login_error')
-
-        elif action == 'register':
-            if not username or not password or not email:
-                flash('Please fill in all fields', 'register_error')
-                return render_template('auth.html')
-
-            cursor = get_cursor()
-            try:
-                cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
-                if cursor.fetchone():
-                    flash('Username already exists', 'register_error')
-                else:
-                    hashed_password = generate_password_hash(password)
-                    cursor.execute(
-                        "INSERT INTO users (username, password, email) VALUES (%s, %s, %s)",
-                        (username, hashed_password, email)
-                    )
-                    mysql.connection.commit()
-                    flash('Registration successful! Please login.', 'register_success')
-                    return redirect(url_for('auth'))
-            except Exception as e:
-                mysql.connection.rollback()
-                logging.exception("Registration error: %s", e)
-                flash('Registration failed due to server error', 'register_error')
-            finally:
-                cursor.close()
-
-    return render_template('auth.html')
+        email = (request.form.get('email') or '').strip()
+        
+        if request.form.get('action') == 'login':
+            return handle_login(username, password)
+        elif request.form.get('action') == 'register':
+            return handle_registration(username, password, email)
+            
+    return render_template(TEMPLATE_AUTH)
 
 
 # ---------------- Logout ----------------
@@ -150,26 +161,41 @@ def logout():
 
 
 # ---------------- Menu ----------------
-@app.route('/menu')
-@login_required
-def menu():
-    search = (request.args.get('search') or '').strip()
-    category = (request.args.get('category') or '').strip()
-
+def build_menu_query(search, category):
     query = "SELECT * FROM food WHERE available = TRUE"
     params = []
-
     if search:
         query += " AND food_name LIKE %s"
         params.append(f"%{search}%")
     if category:
         query += " AND category = %s"
         params.append(category)
+    return query, params
 
+def calculate_food_price(food, coupon=None):
+    try:
+        price = float(food.get('price') or 0)
+        
+        if coupon:
+            price_after = price * (1 - float(coupon.get('discount', 0)))
+        else:
+            price_after = price
+            
+        return round(price_after, 2)
+    except Exception:
+        return float(food.get('price') or 0)
+
+@app.route('/menu')
+@login_required
+def menu():
+    search = (request.args.get('search') or '').strip()
+    category = (request.args.get('category') or '').strip()
     cursor = get_cursor()
     foods = []
     categories = []
+    
     try:
+        query, params = build_menu_query(search, category)
         cursor.execute(query, params)
         foods = cursor.fetchall() or []
 
@@ -179,17 +205,7 @@ def menu():
 
         coupon = session.get('coupon')
         for food in foods:
-            try:
-                price = float(food.get('price') or 0)
-                item_disc = float(food.get('discount_percent') or 0)
-                price_after_item = price * (1 - item_disc / 100) if item_disc > 0 else price
-                if coupon:
-                    price_after = price_after_item * (1 - float(coupon.get('discount', 0)))
-                else:
-                    price_after = price_after_item
-                food['discounted_price'] = round(price_after, 2)
-            except Exception:
-                food['discounted_price'] = float(food.get('price') or 0)
+            food['discounted_price'] = calculate_food_price(food, coupon)
 
         cursor.execute("SELECT DISTINCT category FROM food WHERE available = TRUE")
         categories = [row['category'] for row in cursor.fetchall()] or []
@@ -250,7 +266,6 @@ def order(food_id):
             address = (request.form.get('address') or '').strip() if delivery_option == 'delivery' else ''
             note = (request.form.get('note') or '').strip()
 
-            # validate quantity
             try:
                 quantity = int(quantity_raw)
                 if quantity <= 0:
