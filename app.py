@@ -311,10 +311,18 @@ def order_success(food_id):
     return render_template('order_success.html', food_id=food_id)
 
 
+# ------------------ View Receipt ------------------
+# ---------------- View Receipt ----------------
 @app.route('/order/<int:order_id>/receipt')
+@login_required
 def view_receipt(order_id):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT * FROM orders WHERE order_id = %s", (order_id,))
+    cursor.execute("""
+        SELECT o.*, f.food_name, f.image_url
+        FROM orders o
+        JOIN food f ON o.food_id = f.food_id
+        WHERE o.order_id = %s
+    """, (order_id,))
     order = cursor.fetchone()
     cursor.close()
     
@@ -324,6 +332,68 @@ def view_receipt(order_id):
         flash("Order not found.", "error")
         return redirect(url_for('order_list'))
 
+
+# ---------------- Pay Order ----------------
+@app.route('/order/<int:order_id>/pay', methods=['GET', 'POST'])
+@login_required
+def pay_order_page(order_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("""
+        SELECT o.*, f.food_name, f.image_url
+        FROM orders o
+        JOIN food f ON o.food_id = f.food_id
+        WHERE o.order_id = %s
+    """, (order_id,))
+    order = cursor.fetchone()
+    cursor.close()
+
+    if not order:
+        flash("Order not found.", "error")
+        return redirect(url_for('order_list'))
+
+    if request.method == 'POST':
+        payment_method = request.form.get('payment_method', 'Cash')
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute("""
+                UPDATE orders 
+                SET payment_method=%s, payment_date=%s 
+                WHERE order_id=%s
+            """, (payment_method, datetime.now(), order_id))
+            mysql.connection.commit()
+        except Exception as e:
+            mysql.connection.rollback()
+            flash(f"Payment failed: {str(e)}", "error")
+            cursor.close()
+            return redirect(url_for('pay_order_page', order_id=order_id))
+        finally:
+            cursor.close()
+        
+        flash(f"Payment successful with {payment_method}! ✅", "success")
+        return redirect(url_for('payment_success', order_id=order_id))
+
+    return render_template('pay_order.html', order=order)
+
+
+# ---------------- Payment Success Page ----------------
+@app.route('/payment_success/<int:order_id>')
+@login_required
+def payment_success(order_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("""
+        SELECT o.*, f.food_name, f.image_url
+        FROM orders o
+        JOIN food f ON o.food_id = f.food_id
+        WHERE o.order_id = %s
+    """, (order_id,))
+    order = cursor.fetchone()
+    cursor.close()
+
+    if not order:
+        flash("Order not found.", "error")
+        return redirect(url_for('order_list'))
+
+    return render_template('payment_success.html', order=order)
 
 
 # ---------------- Order List ----------------

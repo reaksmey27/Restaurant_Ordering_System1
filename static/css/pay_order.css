@@ -1,0 +1,221 @@
+/* ---------------- Reset ---------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+    background: #f4f6f8;
+    color: #2f3542;
+    line-height: 1.6;
+    scroll-behavior: smooth;
+}
+
+/* ---------------- Container ---------------- */
+.receipt-container {
+    max-width: 600px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.receipt-container h1 {
+    text-align: center;
+    font-size: 32px;
+    color: #2ecc71;
+    margin-bottom: 20px;
+}
+
+#thank {
+    text-align: center;
+    font-size: 1rem;
+    color: #4b5563;
+    margin: 10px 0;
+}
+
+
+/* ---------------- Food Image ---------------- */
+.food-image {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    display: block;
+    margin: 0 auto 20px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.food-image:hover {
+    transform: scale(1.05);
+}
+
+/* ---------------- Paragraphs ---------------- */
+.receipt-container p {
+    font-size: 16px;
+    margin: 5px 0;
+    color: #2f3542;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 15px 0;
+}
+
+/* ---------------- Table ---------------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #f1f1f1;
+    font-size: 14px;
+}
+
+table th {
+      background: linear-gradient(135deg, #ff4757, #e84118);
+
+    color: white;
+    font-weight: 600;
+}
+
+table td {
+    color: #555;
+}
+
+/* ---------------- Payment Form ---------------- */
+.payment-section {
+    margin: 25px 0;
+    text-align: left;
+}
+
+.payment-section select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.payment-section select:focus {
+    border-color: #2ecc71;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+}
+
+.info-note {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+/* ---------------- Buttons ---------------- */
+.button {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-back,
+.btn-pay {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-back {
+      background: linear-gradient(135deg, #ff4757, #e84118);
+
+    color: white;
+}
+
+.btn-back:hover {
+      background: linear-gradient(135deg, #e84118, #ff6b81);
+
+    transform: translateY(-2px);
+}
+
+.btn-pay {
+      background: linear-gradient(135deg, #ff4757, #e84118);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+.btn-pay:hover {
+      background: linear-gradient(135deg, #e84118, #ff6b81);
+
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+}
+
+/* ---------------- Paid Status ---------------- */
+.paid-status {
+    font-size: 18px;
+    color: #2ecc71;
+    text-align: center;
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+/* ---------------- Animations ---------------- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 600px) {
+    .receipt-container {
+        padding: 20px;
+    }
+
+    table th,
+    table td {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .btn-back,
+    .btn-pay {
+        width: 100%;
+        padding: 12px 0;
+    }
+
+    .payment-section {
+        text-align: center;
+    }
+
+    .payment-section select {
+        width: 100%;
+    }
+}
