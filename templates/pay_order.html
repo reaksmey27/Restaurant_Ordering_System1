@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay Order #{{ order.order_id }}</title>
+    <link rel="stylesheet" href="/static/css/pay_order.css">
+</head>
+
+<body>
+    <div class="receipt-container">
+        <h1>Pay for Order #{{ order.order_id }}</h1>
+        <p id="thank">Hello <strong>{{ order.customer_name }}</strong>, please complete your payment.</p>
+
+        {% if order.image_url %}
+        <img src="{{ order.image_url }}" alt="{{ order.food_name }}" class="food-image">
+        {% endif %}
+
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+        <p><strong>Phone:</strong> {{ order.phone }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Delivery:</strong> {{ order.delivery_option }} via {{ order.delivery_service }}</p>
+
+        <hr>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Food</th>
+                    <th>Qty</th>
+                    <th>Unit ($)</th>
+                    <th>Total ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ order.food_name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>${{ "%.2f"|format(order.total_price / order.quantity) }}</td>
+                    <td>${{ "%.2f"|format(order.total_price) }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <p><strong>Total:</strong> ${{ "%.2f"|format(order.total_price) }}</p>
+
+        <!-- Payment form -->
+        <div class="payment-section">
+            <form action="" method="POST">
+                <label for="payment_method"><strong>Select Payment Method:</strong></label><br><br>
+                <select name="payment_method" id="payment_method" required>
+                    <option value="" disabled selected>-- Choose a payment method --</option>
+                    <option value="Cash">💵 Cash (Pay upon delivery)</option>
+                    <option value="Credit Card">💳 Credit Card (Visa/Mastercard)</option>
+                    <option value="Online Payment">🌐 Online Payment (Pay via app)</option>
+                </select>
+                <p class="info-note">Once you complete payment, your order will be confirmed.</p>
+                <div class="button">
+                    <a href="{{ url_for('order_list') }}" class="btn-back">Back to Orders</a>
+                    <button type="submit" class="btn-pay">Pay Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

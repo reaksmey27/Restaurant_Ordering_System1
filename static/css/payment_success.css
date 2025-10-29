@@ -33,6 +33,10 @@ body {
   margin-bottom: 20px;
 }
 
+#thank {
+    text-align: center;
+}
+
 /* Food Image */
 .food-image {
   width: 100%;
