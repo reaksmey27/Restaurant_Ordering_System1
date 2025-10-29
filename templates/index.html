@@ -88,7 +88,8 @@
                             <p class="category">{{ food.category }}</p>
                             <p class="price">
                                 {% if food.get('discounted_price') and food.discounted_price != food.price %}
-                                <span class="original-price" style="text-decoration: line-through;">${{ food.price }}</span>
+                                <span class="original-price" style="text-decoration: line-through;">${{ food.price
+                                    }}</span>
                                 <span class="discounted-price">${{ food.discounted_price }}</span>
                                 {% else %}
                                 ${{ food.price }}
@@ -131,6 +132,39 @@
                 </div>
             </div>
         </section>
+        <!-- Feedback and Map Section -->
+        <section class="feedback-map">
+            <div class="container">
+                <h2>💬 We’d Love Your Feedback!</h2>
+                <p>Share your thoughts and find our restaurant easily below.</p>
+
+                <div class="feedback-map-grid">
+                    <!-- Feedback Form -->
+                    <form id="feedbackForm" class="feedback-form">
+                        <h3>Feedback</h3>
+                        <input type="text" id="name" placeholder="Your Name" required>
+                        <input type="email" id="email" placeholder="Your Email" required>
+                        <textarea id="message" placeholder="Your Feedback" required></textarea>
+                        <button type="submit">Send Feedback</button>
+                    </form>
+
+                    <!-- Popup -->
+                    <div id="feedbackPopup" class="popup">
+                        <div class="popup-content">
+                            <p>✅ Thank you for your feedback!</p>
+                            <button id="closePopup">OK</button>
+                        </div>
+                    </div>
+
+                    <!-- Map Iframe -->
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.481434918377!2d104.8885!3d11.5621!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3109516b0bdfc4e3%3A0x2a5dc977f84714de!2sPhnom%20Penh%2C%20Cambodia!5e0!3m2!1sen!2skh!4v1700000000000!5m2!1sen!2skh"
+                        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Detailed Footer -->

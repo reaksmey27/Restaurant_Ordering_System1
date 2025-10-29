@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ------------------- Cart state -------------------
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-    // DOM refs (guarded)
+    // DOM references
     const cartBtn = document.getElementById('cartBtn');
     const cartPopup = document.getElementById('cartPopup');
     const closeCartBtn = document.getElementById('closeCartBtn');
@@ -23,26 +23,32 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function addToCart(foodId, foodName, price, imageUrl) {
-      // normalize id to string for consistent comparisons
       const id = String(foodId);
       const existing = cart.find(i => String(i.food_id) === id);
-      if (existing) existing.quantity = (existing.quantity || 0) + 1;
-      else cart.push({ food_id: id, food_name: foodName, price: Number(price) || 0, quantity: 1, image_url: imageUrl || '' });
+      if (existing) {
+        existing.quantity = (existing.quantity || 0) + 1;
+      } else {
+        cart.push({
+          food_id: id,
+          food_name: foodName,
+          price: Number(price) || 0,
+          quantity: 1,
+          image_url: imageUrl || ''
+        });
+      }
       saveCart();
     }
 
     function removeFromCart(foodId) {
       const id = String(foodId);
-      const idx = cart.findIndex(i => String(i.food_id) === id);
-      if (idx !== -1) {
-        cart.splice(idx, 1);
-        saveCart();
-      }
+      cart = cart.filter(i => String(i.food_id) !== id);
+      saveCart();
     }
 
     function displayCartItems() {
       if (!cartItemsList) return;
       cartItemsList.innerHTML = '';
+
       if (cart.length === 0) {
         cartItemsList.innerHTML = '<tr><td colspan="6">Your cart is empty</td></tr>';
         return;
@@ -62,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    // Simple escape for inserted HTML (prevents accidental injection)
     function escapeHtml(str) {
       if (str == null) return '';
       return String(str)
@@ -73,60 +78,57 @@ document.addEventListener('DOMContentLoaded', function () {
         .replace(/>/g, '&gt;');
     }
 
-    // ------------------- Order button handling (delegation) -------------------
-    // Use delegation so dynamically-rendered cards still work.
+    // ------------------- Order button handling -------------------
     document.addEventListener('click', function (evt) {
-      const btn = evt.target.closest && evt.target.closest('.order-btn');
+      const btn = evt.target.closest('.order-btn');
       if (!btn) return;
-
       evt.preventDefault();
 
-      // Prefer data attributes on the button or its food-card ancestor
       const foodCard = btn.closest('.food-card');
       if (!foodCard) return;
 
-      // Try data-food-id attribute on button then on ancestor, fallback to parsing href from anchor
-      let foodId = btn.dataset.foodId || (foodCard.dataset && foodCard.dataset.foodId) || null;
-
+      let foodId = btn.dataset.foodId || foodCard.dataset.foodId || null;
       if (!foodId) {
-        // check for ancestor anchor with /order/<id>
         const link = btn.closest('a');
         const href = link ? link.getAttribute('href') : null;
         if (href) {
-          const m = href.match(/\/order\/(\d+)/);
-          if (m) foodId = m[1];
+          const match = href.match(/\/order\/(\d+)/);
+          if (match) foodId = match[1];
         }
       }
 
-      const nameEl = foodCard.querySelector('h2') || foodCard.querySelector('.food-name');
+      const nameEl = foodCard.querySelector('h2, .food-name');
       const foodName = nameEl ? nameEl.textContent.trim() : 'Item';
 
-      // price element: prefer .discounted-price then use data-original, then fallback to text content
       let price = 0;
       const priceEl = foodCard.querySelector('.price');
       if (priceEl) {
         const discEl = priceEl.querySelector('.discounted-price');
-        if (discEl) price = parseFloat(discEl.textContent.replace(/[^0-9.\-]/g, '')) || 0;
-        else if (priceEl.dataset && priceEl.dataset.original) price = parseFloat(priceEl.dataset.original) || 0;
-        else price = parseFloat(priceEl.textContent.replace(/[^0-9.\-]/g, '')) || 0;
+        if (discEl) {
+          price = parseFloat(discEl.textContent.replace(/[^0-9.\-]/g, '')) || 0;
+        } else if (priceEl.dataset.original) {
+          price = parseFloat(priceEl.dataset.original) || 0;
+        } else {
+          price = parseFloat(priceEl.textContent.replace(/[^0-9.\-]/g, '')) || 0;
+        }
       }
 
       const imageEl = foodCard.querySelector('img');
-      const imageUrl = imageEl ? imageEl.getAttribute('src') : '';
+      const imageUrl = imageEl ? imageEl.src : '';
 
       if (foodId) addToCart(foodId, foodName, price, imageUrl);
       updateCartDisplay();
       displayCartItems();
 
-      // if there is an anchor parent, navigate after a tiny delay to ensure localStorage is saved
       const parentAnchor = btn.closest('a');
       if (parentAnchor && parentAnchor.href) {
-        // small timeout ensures localStorage write completes (usually synchronous, but keep UX smooth)
-        setTimeout(() => { window.location.href = parentAnchor.href; }, 50);
+        setTimeout(() => {
+          window.location.href = parentAnchor.href;
+        }, 50);
       }
     });
 
-    // ------------------- Cart popup handlers -------------------
+    // ------------------- Cart popup -------------------
     if (cartBtn && cartPopup) {
       cartBtn.addEventListener('click', function () {
         displayCartItems();
@@ -135,21 +137,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (closeCartBtn && cartPopup) {
-      closeCartBtn.addEventListener('click', function () { cartPopup.style.display = 'none'; });
+      closeCartBtn.addEventListener('click', function () {
+        cartPopup.style.display = 'none';
+      });
     }
 
-    // close when clicking outside popup content (overlay)
     window.addEventListener('click', function (evt) {
-      if (!cartPopup) return;
-      if (evt.target === cartPopup) cartPopup.style.display = 'none';
+      if (cartPopup && evt.target === cartPopup) {
+        cartPopup.style.display = 'none';
+      }
     });
 
-    // handle cancel buttons inside cart using delegation
     if (cartItemsList) {
       cartItemsList.addEventListener('click', function (evt) {
-        const btn = evt.target.closest && evt.target.closest('.cancel-btn');
+        const btn = evt.target.closest('.cancel-btn');
         if (!btn) return;
-        const id = btn.getAttribute('data-food-id');
+        const id = btn.dataset.foodId;
         if (!id) return;
         removeFromCart(id);
         displayCartItems();
@@ -157,10 +160,9 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    // Initial display update
     updateCartDisplay();
 
-    // ------------------- Auth panel toggle -------------------
+    // ------------------- Auth toggle -------------------
     if (container) {
       const signUpButton = document.getElementById('signUp');
       const signInButton = document.getElementById('signIn');
@@ -172,8 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
         signInButton.addEventListener('click', () => container.classList.remove('right-panel-active'));
       }
 
-      // Auto-switch based on flash classes present in DOM
-      if (document.querySelector('.register_error') || document.querySelector('.register_success')) {
+      if (document.querySelector('.register_error, .register_success')) {
         container.classList.add('right-panel-active');
       }
       if (document.querySelector('.login_error')) {
@@ -194,6 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
           promoMessage.textContent = '❌ Please enter a coupon code.';
           return;
         }
+
         try {
           const response = await fetch('/apply_coupon', {
             method: 'POST',
@@ -201,45 +203,60 @@ document.addEventListener('DOMContentLoaded', function () {
             body: new URLSearchParams({ coupon_code: code })
           });
           const data = await response.json();
+
           if (data.success) {
             promoMessage.textContent = `✅ Coupon "${code}" applied! 20% off will be applied.`;
-
-            // Update prices on menu: use dataset-original if present, otherwise attempt to parse.
-            document.querySelectorAll('.food-card').forEach(card => {
-              const priceEl = card.querySelector('.price');
-              if (!priceEl) return;
-
-              let original = null;
-              if (priceEl.dataset && priceEl.dataset.original) {
-                original = parseFloat(priceEl.dataset.original);
-              } else {
-                // try to find numeric value from displayed content (strip non-numeric)
-                const txt = priceEl.textContent || '';
-                original = parseFloat(txt.replace(/[^0-9.\-]/g, '')) || null;
-              }
-
-              if (original != null && !Number.isNaN(original)) {
-                const discountedPrice = (original * 0.8).toFixed(2);
-                priceEl.innerHTML = `
-                  <span class="original-price" style="text-decoration: line-through;">$${Number(original).toFixed(2)}</span>
-                  <span class="discounted-price">$${discountedPrice}</span>
-                `;
-                // ensure dataset.original remains consistent for future toggles
-                priceEl.dataset.original = Number(original).toFixed(2);
-              }
+            document.querySelectorAll('.food-card .price').forEach(priceEl => {
+              let original = parseFloat(priceEl.dataset.original || priceEl.textContent.replace(/[^0-9.\-]/g, '')) || 0;
+              const discounted = (original * 0.8).toFixed(2);
+              priceEl.innerHTML = `
+                <span class="original-price" style="text-decoration: line-through;">$${original.toFixed(2)}</span>
+                <span class="discounted-price">$${discounted}</span>
+              `;
+              priceEl.dataset.original = original.toFixed(2);
             });
           } else {
             promoMessage.textContent = `❌ ${data.message || 'Invalid coupon code.'}`;
           }
         } catch (err) {
           promoMessage.textContent = '❌ Error applying coupon. Try again.';
-          console.error('Coupon error', err);
+          console.error('Coupon error:', err);
         }
       });
     }
 
+    // ------------------- Feedback form + popup -------------------
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackPopup = document.getElementById('feedbackPopup');
+    const closePopup = document.getElementById('closePopup');
+
+    if (feedbackForm) {
+      feedbackForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const message = document.getElementById('message').value.trim();
+        if (!name || !message) {
+          alert('❌ Please fill out both name and feedback message.');
+          return;
+        }
+        feedbackPopup.style.display = 'block';
+        feedbackForm.reset();
+      });
+    }
+
+    if (closePopup) {
+      closePopup.addEventListener('click', function () {
+        feedbackPopup.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('click', function (e) {
+      if (e.target === feedbackPopup) {
+        feedbackPopup.style.display = 'none';
+      }
+    });
+
   } catch (err) {
-    // top-level safety
-    console.error('Cart script error:', err);
+    console.error('Script error:', err);
   }
 });
