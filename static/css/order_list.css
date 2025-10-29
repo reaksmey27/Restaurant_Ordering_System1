@@ -1,3 +1,6 @@
+/* ==============================
+   GLOBAL RESET & BASE
+============================== */
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +15,9 @@ body {
   scroll-behavior: smooth;
 }
 
-/* ---------- Navbar ---------- */
+/* ==============================
+   NAVBAR
+============================== */
 .navbar {
   position: sticky;
   top: 0;
@@ -53,7 +58,6 @@ body {
   font-weight: 500;
   position: relative;
   transition: all 0.3s ease;
-  cursor: pointer;
 }
 
 .nav-links a::after {
@@ -88,7 +92,9 @@ body {
   transform: translateY(-2px);
 }
 
-/* ---------- Cart Popup ---------- */
+/* ==============================
+   CART POPUP
+============================== */
 .cart-popup {
   display: none;
   position: fixed;
@@ -167,7 +173,9 @@ body {
   transform: translateY(-2px);
 }
 
-/* ---------- Header ---------- */
+/* ==============================
+   HEADER
+============================== */
 .header {
   text-align: center;
   background: linear-gradient(135deg, #ff4757, #ff6b81);
@@ -181,7 +189,7 @@ body {
 
 .header h1 {
   margin-bottom: 8px;
-  font-size: 35px;
+  font-size: clamp(28px, 5vw, 35px);
   font-weight: 700;
 }
 
@@ -210,7 +218,9 @@ body {
   box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
-/* ---------- Orders Table ---------- */
+/* ==============================
+   ORDERS TABLE
+============================== */
 .table-container {
   width: 90%;
   max-width: 1400px;
@@ -245,10 +255,6 @@ thead th {
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-thead th:first-child {
-  width: 60px;
 }
 
 tbody td {
@@ -290,30 +296,70 @@ input[type="checkbox"] {
   font-size: 19px;
 }
 
-/* ---------- Action Buttons ---------- */
+/* ==============================
+   BUTTON GROUP IN TABLE
+============================== */
+.button-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* space between View and Delete buttons */
+}
+
+.button-group form {
+    margin: 0; /* remove default form margin */
+}
+
+.button-group button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* space between icon and text */
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+/* ==============================
+   VIEW RECEIPT BUTTON
+============================== */
+.btn-view {
+    background: linear-gradient(135deg, #2ed573, #1eae5f);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
+}
+
+.btn-view:hover {
+    background: linear-gradient(135deg, #1eae5f, #2ed573);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(46, 213, 115, 0.4);
+}
+
+/* ==============================
+   DELETE BUTTON
+============================== */
 .btn-delete {
-  background: linear-gradient(135deg, #ff4757, #e84118);
-  border: none;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(255, 71, 87, 0.3);
-  display: inline-block;
+  margin-top: 10px;
+    background: linear-gradient(135deg, #ff4757, #e84118);
+    color: white;
+    padding: 8px 18px; /* match View button for consistency */
+    border-radius: 20px; /* match View button */
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
 }
 
 .btn-delete:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+    background: linear-gradient(135deg, #e84118, #ff6b81);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
 }
 
-/* ================================
-   DETAILED FOOTER
-================================ */
+/* ==============================
+   FOOTER
+============================== */
 .footer {
   background: linear-gradient(135deg, #2f3542 0%, #1e272e 100%);
   color: white;
@@ -441,7 +487,7 @@ input[type="checkbox"] {
   opacity: 0.7;
 }
 
-/* PERFECT PAYMENT ICONS */
+/* Payment Icons */
 .payment-methods {
   display: flex;
   align-items: center;
@@ -470,7 +516,9 @@ input[type="checkbox"] {
   transform: scale(1.1) translateY(-2px);
 }
 
-/* ---------- Animations ---------- */
+/* ==============================
+   ANIMATIONS
+============================== */
 @keyframes fadeIn {
   from { 
     opacity: 0; 

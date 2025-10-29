@@ -311,6 +311,21 @@ def order_success(food_id):
     return render_template('order_success.html', food_id=food_id)
 
 
+@app.route('/order/<int:order_id>/receipt')
+def view_receipt(order_id):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * FROM orders WHERE order_id = %s", (order_id,))
+    order = cursor.fetchone()
+    cursor.close()
+    
+    if order:
+        return render_template('receipt.html', order=order)
+    else:
+        flash("Order not found.", "error")
+        return redirect(url_for('order_list'))
+
+
+
 # ---------------- Order List ----------------
 @app.route('/order-list')
 @login_required
