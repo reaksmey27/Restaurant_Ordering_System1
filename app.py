@@ -99,7 +99,7 @@ def handle_login(username, password):
         user = cursor.fetchone()
         if user and check_password_hash(user['password'], password):
             session['username'] = user['username']
-            return redirect(url_for('menu'))
+            return redirect(url_for('home'))
         flash(ERR_LOGIN, 'login_error')
         return render_template(TEMPLATE_AUTH)
     except Exception as e:
@@ -394,6 +394,29 @@ def payment_success(order_id):
         return redirect(url_for('order_list'))
 
     return render_template('payment_success.html', order=order)
+
+
+
+@app.route('/submit_feedback', methods=['POST'])
+@login_required
+def submit_feedback():
+    name = request.form.get('name')
+    email = request.form.get('email')
+    message = request.form.get('message')
+
+    if not name or not email or not message:
+        return jsonify({'success': False, 'error': 'All fields required'})
+
+    cursor = mysql.connection.cursor()
+    cursor.execute(
+        "INSERT INTO feedback (name, email, message) VALUES (%s, %s, %s)",
+        (name, email, message)
+    )
+    mysql.connection.commit()
+    cursor.close()
+
+    return jsonify({'success': True})
+
 
 
 # ---------------- Order List ----------------

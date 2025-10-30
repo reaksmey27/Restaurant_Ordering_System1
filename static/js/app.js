@@ -225,22 +225,41 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    // ------------------- Feedback form + popup -------------------
+    // ------------------- Feedback form + popup (store in DB) -------------------
     const feedbackForm = document.getElementById('feedbackForm');
     const feedbackPopup = document.getElementById('feedbackPopup');
     const closePopup = document.getElementById('closePopup');
 
     if (feedbackForm) {
-      feedbackForm.addEventListener('submit', function (e) {
+      feedbackForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const name = document.getElementById('name').value.trim();
-        const message = document.getElementById('message').value.trim();
-        if (!name || !message) {
-          alert('❌ Please fill out both name and feedback message.');
+
+        const formData = new FormData(feedbackForm);
+        const data = Object.fromEntries(formData.entries());
+
+        if (!data.name || !data.email || !data.message) {
+          alert('❌ Please fill out all fields.');
           return;
         }
-        feedbackPopup.style.display = 'block';
-        feedbackForm.reset();
+
+        try {
+          const response = await fetch('/submit_feedback', {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            feedbackPopup.style.display = 'block';
+            feedbackForm.reset();
+          } else {
+            alert('❌ Error: ' + (result.error || 'Could not send feedback.'));
+          }
+        } catch (error) {
+          console.error('Feedback error:', error);
+          alert('❌ Failed to submit feedback. Try again later.');
+        }
       });
     }
 
