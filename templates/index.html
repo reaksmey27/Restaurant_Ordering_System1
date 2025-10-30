@@ -140,11 +140,11 @@
 
                 <div class="feedback-map-grid">
                     <!-- Feedback Form -->
-                    <form id="feedbackForm" class="feedback-form">
+                    <form id="feedbackForm" class="feedback-form" method="POST" action="/submit_feedback">
                         <h3>Feedback</h3>
-                        <input type="text" id="name" placeholder="Your Name" required>
-                        <input type="email" id="email" placeholder="Your Email" required>
-                        <textarea id="message" placeholder="Your Feedback" required></textarea>
+                        <input type="text" id="name" name="name" placeholder="Your Name" required>
+                        <input type="email" id="email" name="email" placeholder="Your Email" required>
+                        <textarea id="message" name="message" placeholder="Your Feedback" required></textarea>
                         <button type="submit">Send Feedback</button>
                     </form>
 
@@ -152,9 +152,10 @@
                     <div id="feedbackPopup" class="popup">
                         <div class="popup-content">
                             <p>✅ Thank you for your feedback!</p>
-                            <button id="closePopup">OK</button>
+                            <button id="closePopup">Close</button>
                         </div>
                     </div>
+
 
                     <!-- Map Iframe -->
                     <iframe
