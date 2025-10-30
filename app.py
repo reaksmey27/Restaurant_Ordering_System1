@@ -312,7 +312,6 @@ def order_success(food_id):
 
 
 # ------------------ View Receipt ------------------
-# ---------------- View Receipt ----------------
 @app.route('/order/<int:order_id>/receipt')
 @login_required
 def view_receipt(order_id):
@@ -396,7 +395,7 @@ def payment_success(order_id):
     return render_template('payment_success.html', order=order)
 
 
-
+# ---------------- Feedback ----------------
 @app.route('/submit_feedback', methods=['POST'])
 @login_required
 def submit_feedback():
