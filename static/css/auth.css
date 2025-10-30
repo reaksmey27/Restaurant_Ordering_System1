@@ -276,3 +276,91 @@ input:focus {
         transform: translateY(0);
     }
 }
+
+
+/* ------------------- Responsive Design ------------------- */
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .container {
+        width: 90%;
+        min-height: 600px;
+    }
+
+    form {
+        padding: 0 30px;
+    }
+
+    .overlay {
+        background-position: center;
+    }
+
+    button {
+        padding: 10px 35px;
+    }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+    body {
+        height: auto;
+        padding: 20px 0;
+    }
+
+    .container {
+        width: 100%;
+        min-height: auto;
+        box-shadow: none;
+        border-radius: 0;
+        flex-direction: column;
+    }
+
+    .form-container,
+    .overlay-container {
+        position: relative;
+        width: 100%;
+        height: auto;
+        transform: none !important;
+    }
+
+    .overlay {
+        display: none;
+    }
+
+    .sign-in-container,
+    .sign-up-container {
+        width: 100%;
+        opacity: 1;
+        transform: none !important;
+    }
+
+    form {
+        padding: 20px;
+    }
+
+    input {
+        padding: 10px 12px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .social-container {
+        margin: 15px 0;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    p {
+        font-size: 13px;
+    }
+
+    a {
+        font-size: 13px;
+    }
+}

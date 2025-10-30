@@ -193,29 +193,60 @@ table td {
     }
 }
 
-/* ---------------- Responsive ---------------- */
-@media (max-width: 600px) {
+/* ==============================
+   TABLET (≤1024px)
+============================== */
+@media (max-width: 1024px) {
     .receipt-container {
-        padding: 20px;
+        max-width: 90%;
+        padding: 25px;
+        margin: 40px auto;
+    }
+
+    .food-image {
+        max-width: 200px;
     }
 
     table th,
     table td {
-        padding: 8px;
-        font-size: 12px;
+        font-size: 13px;
+        padding: 10px;
     }
 
     .btn-back,
     .btn-pay {
-        width: 100%;
-        padding: 12px 0;
+        padding: 12px 24px;
+        font-size: 15px;
+    }
+}
+
+/* ==============================
+   MOBILE (≤768px)
+============================== */
+@media (max-width: 768px) {
+    .receipt-container {
+        padding: 20px;
+        margin: 30px auto;
+    }
+
+    .food-image {
+        max-width: 150px;
+    }
+
+    table th,
+    table td {
+        font-size: 12px;
+        padding: 8px;
     }
 
     .payment-section {
         text-align: center;
     }
 
-    .payment-section select {
+    .btn-back,
+    .btn-pay {
         width: 100%;
+        padding: 12px 0;
+        font-size: 14px;
     }
 }

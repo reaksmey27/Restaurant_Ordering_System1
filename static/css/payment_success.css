@@ -174,3 +174,54 @@ table td {
     padding: 12px 0;
   }
 }
+
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .receipt-container {
+    max-width: 90%;
+    padding: 25px;
+    margin: 40px auto;
+  }
+
+  .food-image {
+    max-width: 200px;
+  }
+
+  table th,
+  table td {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .btn-back,
+  .btn-pay {
+    padding: 12px 24px;
+    font-size: 15px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .receipt-container {
+    padding: 20px;
+    margin: 30px auto;
+  }
+
+  .food-image {
+    max-width: 150px;
+  }
+
+  table th,
+  table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .btn-back,
+  .btn-pay {
+    width: 100%;
+    padding: 12px 0;
+    font-size: 14px;
+  }
+}
