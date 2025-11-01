@@ -25,9 +25,10 @@
                     <a href="/menu">Menu</a>
                     {% if session.get('username') %}
                     <a href="/order-list" class="active">Orders</a>
-                    <a href="/logout">Logout</a>
+                    <a href="{{ url_for('logout') }}"><i class="bx bx-log-out"></i> Logout</a></li>
                     {% else %}
                     <a href="/auth">Sign up</a>
+                    <a href="/auth-admin">Admin</a>
                     {% endif %}
                     <button id="cartBtn" class="cart-btn">
                         🛒 Cart (<span id="cartCount">0</span>)

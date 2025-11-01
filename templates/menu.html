@@ -25,9 +25,10 @@
                     <a href="/menu" class="active">Menu</a>
                     {% if session.get('username') %}
                     <a href="/order-list">Orders</a>
-                    <a href="/logout">Logout</a>
+                    <a href="{{ url_for('logout') }}"><i class="bx bx-log-out"></i> Logout</a></li>
                     {% else %}
                     <a href="/auth">Sign up</a>
+                    <a href="/auth-admin">Admin</a>
                     {% endif %}
                     <button id="cartBtn" class="cart-btn">
                         🛒 Cart (<span id="cartCount">0</span>)
@@ -106,10 +107,10 @@
 
                     <p class="price" data-original="{{ food.price }}">
                         {% if food.get('discounted_price') and (food.discounted_price != food.price) %}
-                            <span class="original-price" style="text-decoration: line-through;">${{ food.price }}</span>
-                            <span class="discounted-price">${{ food.discounted_price }}</span>
+                        <span class="original-price" style="text-decoration: line-through;">${{ food.price }}</span>
+                        <span class="discounted-price">${{ food.discounted_price }}</span>
                         {% else %}
-                            ${{ food.price }}
+                        ${{ food.price }}
                         {% endif %}
                     </p>
 
