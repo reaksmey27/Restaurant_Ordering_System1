@@ -256,10 +256,10 @@ table {
 
 thead {
   background: linear-gradient(135deg, #ff4757, #ff6b81);
-  color: white;
 }
 
 thead th {
+  color: white;
   padding: 18px 12px;
   font-weight: 600;
   text-align: center;
@@ -340,8 +340,8 @@ input[type="checkbox"] {
    VIEW RECEIPT BUTTON
 ============================== */
 .btn-view {
-  background: linear-gradient(135deg, #2ed573, #1eae5f);
   color: white;
+  background: linear-gradient(135deg, #2ed573, #1eae5f);
   padding: 8px 18px;
   border-radius: 20px;
   box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
@@ -359,8 +359,8 @@ input[type="checkbox"] {
 .btn-delete {
   margin-top: 10px;
   background: linear-gradient(135deg, #ff4757, #e84118);
-  color: white;
   padding: 8px 18px;
+  color: white;
   /* match View button for consistency */
   border-radius: 20px;
   /* match View button */
@@ -461,8 +461,8 @@ input[type="checkbox"] {
   width: 45px;
   height: 45px;
   background: rgba(255, 255, 255, 0.1);
-  color: white;
   border-radius: 50%;
+  color: white;
   text-decoration: none;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
