@@ -793,6 +793,13 @@ body {
     display: none;
   }
 
+  .cart-content {
+    width: 80%;
+    margin: 60px auto;
+    padding: 20px;
+    max-height: 75vh;
+  }
+
   #cartTable th,
   #cartTable td {
     padding: 10px 8px;
@@ -935,7 +942,7 @@ body {
     width: 80%;
   }
 
-  .nav-links.show {
+  .nav-links .show {
     display: flex;
   }
 
