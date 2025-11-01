@@ -1,0 +1,447 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #fff;
+    color: #2f3542;
+    line-height: 1.6;
+}
+
+/* Navbar Styles */
+nav {
+    background: #ff4757;
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+    transform: scale(1.1);
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    text-transform: uppercase;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+nav ul li a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: white;
+    transition: width 0.3s ease;
+}
+
+nav ul li a:hover::after,
+nav ul li a.active::after {
+    width: 100%;
+}
+
+nav ul li a:hover {
+    opacity: 0.8;
+}
+
+nav ul li a i {
+    font-size: 1.2rem;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    animation: fadeIn 1s ease;
+}
+
+/* Headings */
+h1 {
+    text-align: center;
+    color: #2f3542;
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #2f3542;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Flash Messages */
+.flash-messages {
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.flash-messages p {
+    color: #2f3542;
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+/* Success Message */
+.success-message {
+    background: #2ed573;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Menu Form */
+.menu-form {
+    background: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.menu-form div {
+    margin-bottom: 15px;
+}
+
+.menu-form label {
+    display: block;
+    color: #2f3542;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.menu-form input[type="text"],
+.menu-form input[type="number"],
+.menu-form input[type="url"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+.menu-form input[type="text"]:focus,
+.menu-form input[type="number"]:focus,
+.menu-form input[type="url"]:focus {
+    border-color: #ff4757;
+}
+
+.menu-form input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+.menu-form button {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.menu-form button:hover {
+    background: #e84118;
+    transform: translateY(-2px);
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+th, td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background: #ff4757;
+    color: white;
+    font-weight: 600;
+}
+
+td {
+    color: #2f3542;
+}
+
+tr:hover {
+    background: #ffe6e9;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.no-items {
+    text-align: center;
+    color: #888;
+    font-size: 19px;
+    padding: 20px;
+}
+
+/* Action Buttons in Table */
+td button {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    margin-right: 5px;
+}
+
+td button:hover {
+    background: #e84118;
+    transform: translateY(-2px);
+}
+
+/* Accessibility */
+nav ul li a:focus,
+.menu-toggle:focus,
+table th:focus,
+table td:focus,
+.menu-form button:focus,
+td button:focus {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design - Tablet */
+@media (max-width: 1024px) {
+    .nav-container {
+        width: 94%;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+
+    nav ul {
+        gap: 12px;
+    }
+
+    .menu-form {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 768px) {
+    .nav-container {
+        width: 96%;
+        padding: 0 6px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    nav ul {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 64px;
+        right: 0;
+        background: #ff4757;
+        width: 100%;
+        text-align: center;
+        padding: 20px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        animation: slideDown 0.3s ease;
+    }
+
+    nav ul.show {
+        display: flex;
+    }
+
+    nav ul li a {
+        padding: 12px 0;
+        font-size: 16px;
+    }
+
+    .menu-form {
+        padding: 18px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    th, td {
+        padding: 10px 8px;
+        font-size: 14px;
+    }
+
+    /* Stacked table layout */
+    table {
+        display: block;
+    }
+    thead {
+        display: none;
+    }
+    tr {
+        display: block;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    td {
+        display: block;
+        text-align: right;
+        position: relative;
+        padding-left: 50%;
+    }
+    td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        font-weight: 600;
+        color: #2f3542;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    .menu-form {
+        padding: 15px;
+    }
+
+    .menu-form input[type="text"],
+    .menu-form input[type="number"],
+    .menu-form input[type="url"] {
+        font-size: 14px;
+    }
+
+    .menu-form button {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    th, td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+
+    td button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}

@@ -24,9 +24,10 @@
                     <a href="/menu">Menu</a>
                     {% if session.get('username') %}
                     <a href="/order-list">Orders</a>
-                    <a href="/logout">Logout</a>
+                    <a href="{{ url_for('logout') }}"><i class="bx bx-log-out"></i> Logout</a></li>
                     {% else %}
                     <a href="/auth">Sign up</a>
+                    <a href="/auth-admin">Admin</a>
                     {% endif %}
                     <button id="cartBtn" class="cart-btn">
                         🛒 Cart (<span id="cartCount">0</span>)
@@ -80,42 +81,42 @@
     <main>
         <section class="featured">
             <div class="container">
-                <h2>🍔 Popular Items</h2>
+                <h2>Popular Items</h2>
 
-                <!-- Food Cards Grid -->
                 <div class="menu-container">
+                    {% if foods %}
                     {% for food in foods %}
                     <div class="food-card">
-                        <img src="{{ food.image_url }}" alt="{{ food.food_name }}">
+                        <img src="{{ food.image_url or 'https://via.placeholder.com/300x200?text=' + food.food_name }}"
+                            alt="{{ food.food_name }}"
+                            onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
                         <div class="food-info">
                             <h2>{{ food.food_name }}</h2>
                             <p class="category">{{ food.category }}</p>
                             <p class="price">
-                                {% if food.get('discounted_price') and food.discounted_price != food.price %}
-                                <span class="original-price" style="text-decoration: line-through;">${{ food.price
-                                    }}</span>
-                                <span class="discounted-price">${{ food.discounted_price }}</span>
+                                {% if food.discounted_price and food.discounted_price != food.price %}
+                                <span class="original-price">${{ '%.2f'|format(food.price) }}</span>
+                                <span class="discounted-price">${{ '%.2f'|format(food.discounted_price) }}</span>
                                 {% else %}
-                                ${{ food.price }}
+                                ${{ '%.2f'|format(food.price) }}
                                 {% endif %}
                             </p>
-                            <a href="{{ url_for('order', food_id=food.food_id) }}">
-                                <button class="order-btn">Order Now</button>
+                            <a href="{{ url_for('order', food_id=food.food_id) }}" class="order-btn">
+                                Order Now
                             </a>
                         </div>
                     </div>
-                    {% else %}
-                    <p class="no-items">No food items found 😅</p>
                     {% endfor %}
+                    {% else %}
+                    <p class="no-items">No food items found</p>
+                    {% endif %}
                 </div>
 
-                <!-- View All Button -->
                 <div class="view-all">
-                    <a href="{{ url_for('menu') }}" class="cta-btn secondary">View Full Menu →</a>
+                    <a href="{{ url_for('menu') }}" class="cta-btn secondary">View Full Menu</a>
                 </div>
             </div>
         </section>
-
 
         <!-- Quick Stats -->
         <section class="stats">
@@ -144,12 +145,14 @@
 
                 <div class="feedback-map-grid">
                     <!-- Feedback Form -->
-                    <form id="feedbackForm" class="feedback-form" method="POST" action="/submit_feedback">
+                    <form id="feedbackForm" class="feedback-form">
                         <h3>Feedback</h3>
-                        <input type="text" id="name" name="name" placeholder="Your Name" required>
-                        <input type="email" id="email" name="email" placeholder="Your Email" required>
-                        <textarea id="message" name="message" placeholder="Your Feedback" required></textarea>
-                        <button type="submit">Send Feedback</button>
+                        <input type="text" name="name" placeholder="Your Name" required>
+                        <input type="email" name="email" placeholder="Your Email" required>
+                        <textarea name="message" placeholder="Your Feedback" required></textarea>
+                        <button type="submit" id="submitBtn">
+                            Send Feedback <span id="loadingSpinner" class="spinner" style="display:none;"></span>
+                        </button>
                     </form>
 
                     <!-- Popup -->

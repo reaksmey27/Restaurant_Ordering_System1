@@ -4,9 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auth - Login & Register</title>
-  <link rel="stylesheet" href="/static/css/auth.css">
+  <title>Auth-admin - Login & Register</title>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,800" rel="stylesheet">
   <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="/static/css/auth.css">
 </head>
 
 <body>
@@ -14,8 +15,9 @@
 
     <!-- ================= SIGN UP FORM ================= -->
     <div class="form-container sign-up-container">
-      <form method="POST" action="{{ url_for('auth') }}">
-        <h1>Create Account</h1>
+      <form method="POST" action="{{ url_for('auth_admin') }}" novalidate>
+        <h1>Create Admin Account</h1>
+
         <div class="social-container">
           <a href="#" class="social"><i class='bx bxl-facebook-circle'></i></a>
           <a href="#" class="social"><i class='bx bxl-google-plus-circle'></i></a>
@@ -25,10 +27,10 @@
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div class="flash-messages">
+        <div class="flash-messages" role="alert" aria-live="assertive">
           {% for category, message in messages %}
           {% if category == 'register_error' or category == 'register_success' %}
-          <p class="{{ category }}" aria-live="polite">{{ message }}</p>
+          <p class="{{ category }}">{{ message }}</p>
           {% endif %}
           {% endfor %}
         </div>
@@ -36,18 +38,22 @@
         {% endwith %}
 
         <input type="hidden" name="action" value="register">
-        <input type="text" name="username" placeholder="Name" required aria-label="Username" />
-        <input type="email" name="email" placeholder="Email" required aria-label="Email" />
-        <input type="password" name="password" placeholder="Password" required aria-label="Password" />
-        <input type="password" name="confirm_password" placeholder="Confirm Password" required aria-label="Confirm Password" />
+
+        <input type="text" name="username" placeholder="Admin Name" required aria-label="Admin Name" autocomplete="username" />
+        <input type="email" name="email" placeholder="Admin Email" required aria-label="Email" autocomplete="email" />
+        <input type="password" name="password" placeholder="Password" required aria-label="Password"
+          autocomplete="new-password" />
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required
+          aria-label="Confirm Password" autocomplete="new-password" />
         <button type="submit" aria-label="Sign Up">Sign Up</button>
       </form>
     </div>
 
     <!-- ================= SIGN IN FORM ================= -->
     <div class="form-container sign-in-container">
-      <form method="POST" action="{{ url_for('auth') }}">
-        <h1>Sign in</h1>
+      <form method="POST" action="{{ url_for('auth_admin') }}" novalidate>
+        <h1>Admin Login</h1>
+
         <div class="social-container">
           <a href="#" class="social"><i class='bx bxl-facebook-circle'></i></a>
           <a href="#" class="social"><i class='bx bxl-google-plus-circle'></i></a>
@@ -57,10 +63,10 @@
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div class="flash-messages">
+        <div class="flash-messages" role="alert" aria-live="assertive">
           {% for category, message in messages %}
-          {% if category == 'login_error' or category == 'admin_error' or category == 'login_success' or category == 'admin_success' %}
-          <p class="{{ category }}" aria-live="polite">{{ message }}</p>
+          {% if category in ['login_error', 'admin_error', 'login_success', 'admin_success'] %}
+          <p class="{{ category }}">{{ message }}</p>
           {% endif %}
           {% endfor %}
         </div>
@@ -68,9 +74,12 @@
         {% endwith %}
 
         <input type="hidden" name="action" value="login" id="loginAction">
-        <input type="text" name="username" placeholder="Username" required aria-label="Username" />
-        <input type="password" name="password" placeholder="Password" required aria-label="Password" />
-        <a href="#">Forgot your <span class="pss">password?</span></a>
+
+        <input type="text" name="username" placeholder="Admin Username" required aria-label="Admin Username"
+          autocomplete="username" />
+        <input type="password" name="password" placeholder="Password" required aria-label="Password"
+          autocomplete="current-password" />
+        <a href="#" class="forgot-link">Forgot your <span class="pss">password?</span></a>
         <button type="submit" aria-label="Sign In">Sign In</button>
       </form>
     </div>
@@ -79,21 +88,20 @@
     <div class="overlay-container">
       <div class="overlay">
         <div class="overlay-panel overlay-left">
-          <h1>Welcome Back!</h1>
-          <p>To keep connected with us please login with your personal info</p>
+          <h1>Welcome Back, Admin!</h1>
+          <p>To manage the system, please log in with your admin credentials</p>
           <button class="ghost" id="signIn" aria-label="Sign In">Sign In</button>
         </div>
         <div class="overlay-panel overlay-right">
-          <h1>Hello, Friend!</h1>
-          <p>Enter your personal details and start your journey with us</p>
+          <h1>Hello, New Admin!</h1>
+          <p>Create an account to start managing the platform</p>
           <button class="ghost" id="signUp" aria-label="Sign Up">Sign Up</button>
         </div>
       </div>
     </div>
 
   </section>
-
-  <!-- JS -->
+  <!-- ================= JS ================= -->
   <script src="/static/js/app.js"></script>
 </body>
 

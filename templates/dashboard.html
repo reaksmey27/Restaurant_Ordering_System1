@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🍕 YumYum</div>
+            <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                <i class='bx bx-menu'></i>
+            </button>
+            <ul>
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="bx bx-bar-chart"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('manage_orders') }}"><i class="bx bx-receipt"></i> Manage Orders</a></li>
+                <li><a href="{{ url_for('manage_menu') }}"><i class="bx bx-food-menu"></i> Manage Menu</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="bx bx-log-out"></i> Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <div class="hero">
+        <div class="hero-text">
+            <h1>Restaurant Dashboard</h1>
+            <p>Monitor your restaurant's performance with real-time insights.</p>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <div class="summary-card">
+                <h3>Total Orders</h3>
+                <p>{{ total_orders }}</p>
+            </div>
+            <div class="summary-card">
+                <h3>Total Revenue</h3>
+                <p>${{ '%.2f' % total_revenue }}</p>
+            </div>
+            <div class="summary-card">
+                <h3>Pending Orders</h3>
+                <p>{{ pending_orders }}</p>
+            </div>
+        </div>
+
+        <!-- Recent Orders Table -->
+        <h2>Recent Orders</h2>
+        <table aria-label="Recent Orders">
+            <thead>
+                <tr>
+                    <th scope="col">Order ID</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if recent_orders %}
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>{{ order.order_id }}</td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.delivery_option }}</td>
+                        <td>${{ '%.2f' % order.total_price }}</td>
+                        <td>{{ order.order_date }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="no-items">No recent orders available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('nav ul');
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('show');
+            const expanded = navLinks.classList.contains('show');
+            menuToggle.setAttribute('aria-expanded', expanded);
+        });
+    </script>
+</body>
+</html>

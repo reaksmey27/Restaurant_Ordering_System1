@@ -187,12 +187,14 @@ body {
   min-height: 112px;
   flex-wrap: wrap;
   gap: 40px;
+  animation: heroFadeIn 1.2s ease-out forwards;
 }
 
 .hero-text {
   flex: 1;
   min-width: 300px;
-  animation: fadeIn 1s ease;
+  opacity: 0;
+  animation: heroTextIn 0.9s ease-out 0.3s forwards;
 }
 
 .hero-text h1 {
@@ -223,6 +225,26 @@ body {
   font-size: 16px;
   transition: all 0.3s ease;
   display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-btns .btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, .35);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width .4s ease, height .4s ease;
+}
+
+.hero-btns .btn:hover::after {
+  width: 300px;
+  height: 300px;
 }
 
 .hero-btns .btn.primary {
@@ -251,7 +273,8 @@ body {
   flex: 1;
   display: flex;
   justify-content: center;
-  animation: floatUp 1.2s ease-in-out;
+  opacity: 0;
+  animation: heroImgIn 0.9s ease-out 0.6s forwards;
 }
 
 .hero-img img {
@@ -324,6 +347,10 @@ body {
   font-weight: 600;
 }
 
+.food-info a {
+  text-decoration: none;
+}
+
 .category {
   color: #747d8c;
   font-size: 14px;
@@ -339,10 +366,10 @@ body {
   margin-bottom: 15px;
 }
 
-/* Discounted price styling: show discounted price in red and original price struck-through */
 .price .original-price {
   color: #e84118;
   margin-right: 8px;
+  text-decoration: line-through;
 }
 
 .price .discounted-price {
@@ -544,10 +571,8 @@ body {
 
 .popup-content {
   width: 420px;
-  /* Increased from 300px */
   background: #fff;
   padding: 40px 45px;
-  /* More breathing room */
   border-radius: 14px;
   text-align: center;
   margin: 12% auto;
@@ -558,7 +583,6 @@ body {
 .popup-content p {
   margin-bottom: 25px;
   font-size: 18px;
-  /* Larger text */
   color: #333;
   line-height: 1.5;
 }
@@ -568,7 +592,6 @@ body {
   color: white;
   border: none;
   padding: 12px 25px;
-  /* Bigger button */
   font-size: 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -578,7 +601,6 @@ body {
 .popup-content button:hover {
   background: #218838;
 }
-
 
 .footer {
   background: linear-gradient(135deg, #2f3542 0%, #1e272e 100%);
@@ -735,6 +757,9 @@ body {
   transform: scale(1.1) translateY(-2px);
 }
 
+/* -------------------------------------------------
+   KEYFRAMES
+   ------------------------------------------------- */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -771,6 +796,52 @@ body {
   }
 }
 
+/* HERO ANIMATIONS */
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes heroTextIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroImgIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* --------------------------
    Tablet (<= 1024px)
@@ -848,12 +919,6 @@ body {
     font-size: 20px;
   }
 
-  .cart-content {
-    max-width: 720px;
-    margin: 60px auto;
-    padding: 20px;
-  }
-
   .popup-content {
     width: 360px;
     padding: 30px;
@@ -895,7 +960,6 @@ body {
    Mobile (<= 768px)
    -------------------------- */
 @media (max-width: 768px) {
-
   .nav-container {
     width: 96%;
     padding: 0 6px;
@@ -909,16 +973,12 @@ body {
     font-size: 18px;
   }
 
-  .nav-links.show {
-    display: flex;
-  }
-
   .menu-toggle {
     display: block;
   }
 
-  .nav-links {
-    display: none;
+  .nav-links.show {
+    display: flex;
     flex-direction: column;
     position: absolute;
     top: 64px;
@@ -940,22 +1000,6 @@ body {
   .nav-links .cart-btn {
     margin-top: 10px;
     width: 80%;
-  }
-
-  .nav-links .show {
-    display: flex;
-  }
-
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
   .cart-btn {
@@ -998,7 +1042,6 @@ body {
 
   .hero-img {
     width: 100%;
-    display: block;
   }
 
   .hero-img img {
@@ -1036,11 +1079,6 @@ body {
   .order-btn {
     padding: 10px 18px;
     font-size: 15px;
-  }
-
-  #cartTable th,
-  #cartTable td {
-    padding: 10px 8px;
   }
 
   .cart-content {

@@ -14,10 +14,15 @@ body {
     align-items: center;
     flex-direction: column;
     margin: 0;
+    background: #f6f5f7;
+    overflow: hidden;
 }
 
+/* ------------------- Typography ------------------- */
 h1 {
     font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
 }
 
 p {
@@ -52,11 +57,14 @@ button {
     letter-spacing: 1px;
     text-transform: uppercase;
     cursor: pointer;
-    transition: transform 80ms ease-in, box-shadow 0.3s ease-in-out;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 button:hover {
     box-shadow: 0 8px 15px rgba(250, 188, 43, 0.3);
+    transform: translateY(-2px);
 }
 
 button:active {
@@ -70,6 +78,26 @@ button:focus {
 button.ghost {
     background-color: transparent;
     border-color: #fff;
+    color: #fff;
+}
+
+/* Ripple effect on click */
+button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+button:active::after {
+    width: 300px;
+    height: 300px;
 }
 
 /* ------------------- Form & Input ------------------- */
@@ -91,25 +119,54 @@ input {
     border-radius: 10px;
     border: none;
     background-color: #eee;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
 }
 
 input:focus {
-    background-color: #e0e0e0;
-    outline: none;
+    background-color: #fff;
+    outline: 2px solid #fc6a76;
+    outline-offset: -2px;
 }
 
-/* ------------------- Container ------------------- */
+/* ------------------- HERO-STYLE CONTAINER ------------------- */
 .container {
     width: 1000px;
     max-width: 95%;
     min-height: 650px;
     position: relative;
     overflow: hidden;
-    border-radius: 10px;
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-    animation: fadeIn 1s ease;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 15px 25px rgba(0, 0, 0, 0.1);
 
+    /* HERO ANIMATION: Fade + Slide + Scale + Bounce */
+    opacity: 0;
+    transform: translateY(80px) scale(0.9);
+    animation: heroContainerIn 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Staggered inner elements */
+.sign-in-container,
+.sign-up-container,
+.overlay-panel {
+    opacity: 0;
+    animation: heroElementIn 0.8s ease-out forwards;
+}
+
+.sign-in-container {
+    animation-delay: 0.4s;
+}
+
+.sign-up-container {
+    animation-delay: 0.6s;
+}
+
+.overlay-left {
+    animation-delay: 0.7s;
+}
+
+.overlay-right {
+    animation-delay: 0.7s;
 }
 
 /* ------------------- Sign In / Sign Up ------------------- */
@@ -183,6 +240,7 @@ input:focus {
     background-image: url(/static/images/auth.png);
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center;
     color: #333;
     transform: translateX(0);
     transition: transform 0.6s ease-in-out;
@@ -238,16 +296,19 @@ input:focus {
     border: 1px solid #ddd;
     border-radius: 50%;
     background-color: #fff;
-    transition: background-color 0.3s;
-}
-
-.social-container a i {
-    font-size: 24px;
+    transition: all 0.3s ease;
     color: #333;
 }
 
 .social-container a:hover {
-    background-color: #eee;
+    background: #fc6a76;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(252, 106, 118, 0.3);
+}
+
+.social-container a i {
+    font-size: 20px;
 }
 
 .pss {
@@ -265,10 +326,28 @@ input:focus {
     text-decoration: none;
 }
 
-@keyframes fadeIn {
+/* ------------------- HERO ANIMATIONS ------------------- */
+@keyframes heroContainerIn {
+    0% {
+        opacity: 0;
+        transform: translateY(80px) scale(0.9);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(-15px) scale(1.02);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes heroElementIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
     }
 
     to {
@@ -277,10 +356,7 @@ input:focus {
     }
 }
 
-
 /* ------------------- Responsive Design ------------------- */
-
-/* Tablet (max-width: 1024px) */
 @media (max-width: 1024px) {
     .container {
         width: 90%;
@@ -291,69 +367,78 @@ input:focus {
         padding: 0 30px;
     }
 
-    .overlay {
-        background-position: center;
-    }
-
     button {
         padding: 10px 35px;
     }
 }
 
-/* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
     body {
         height: auto;
-        padding: 20px 0;
+        padding: 30px 0;
+        overflow-y: auto;
     }
 
     .container {
         width: 100%;
         min-height: auto;
-        box-shadow: none;
         border-radius: 0;
-        flex-direction: column;
+        box-shadow: none;
+        animation: heroContainerInMobile 0.7s ease-out forwards;
     }
 
-    .form-container,
-    .overlay-container {
-        position: relative;
-        width: 100%;
-        height: auto;
-        transform: none !important;
+    @keyframes heroContainerInMobile {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
+    /* Hide overlay on mobile */
+    .overlay-container,
     .overlay {
         display: none;
     }
 
+    .form-container,
     .sign-in-container,
     .sign-up-container {
+        position: relative;
         width: 100%;
         opacity: 1;
         transform: none !important;
+        animation: heroElementIn 0.6s ease-out forwards;
+    }
+
+    .sign-in-container {
+        animation-delay: 0.2s;
+    }
+
+    .sign-up-container {
+        animation-delay: 0.3s;
     }
 
     form {
-        padding: 20px;
+        padding: 25px;
     }
 
     input {
-        padding: 10px 12px;
+        padding: 11px 14px;
     }
 
     button {
         width: 100%;
-        padding: 12px;
+        padding: 13px;
         font-size: 13px;
     }
 
-    .social-container {
-        margin: 15px 0;
-    }
-
     h1 {
-        font-size: 22px;
+        font-size: 1.8rem;
     }
 
     p {
