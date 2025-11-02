@@ -178,6 +178,26 @@ body {
   transform: translateY(-2px);
 }
 
+/* Remove Coupon Button – matches your red theme */
+#removeCouponBtn {
+    display: none;
+    margin-top: 12px;
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-weight: 600;
+    width: 100%;
+}
+
+#removeCouponBtn:hover {
+    background: #c82333;
+}
+
 .hero {
   background: linear-gradient(135deg, #fff8f8, #ffecec);
   display: flex;

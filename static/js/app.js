@@ -19,11 +19,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const feedbackForm = document.getElementById('feedbackForm');
     const feedbackPopup = document.getElementById('feedbackPopup');
     const closePopup = document.getElementById('closePopup');
+    const removeCouponBtn = document.getElementById('removeCouponBtn');
 
     // ------------------- Helpers -------------------
     const saveCart = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
     const formatCurrency = n => {
-      try { return '$' + Number(n).toFixed(2); } 
+      try { return '$' + Number(n).toFixed(2); }
       catch { return '$0.00'; }
     };
     const findItemIndexById = id => cart.findIndex(i => String(i.food_id) === String(id));
@@ -49,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
       saveCart();
       updateCartCount();
       window.dispatchEvent(new Event('storage'));
+      showAlert('Added to cart!', 'success');
     };
 
     const removeFromCart = id => {
@@ -56,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
       saveCart();
       updateCartCount();
       window.dispatchEvent(new Event('storage'));
+      showAlert('Item removed', 'info');
     };
 
     const setQuantity = (id, qty) => {
@@ -68,6 +71,18 @@ document.addEventListener('DOMContentLoaded', function () {
       window.dispatchEvent(new Event('storage'));
     };
 
+    // ------------------- Coupon Helpers -------------------
+    const fetchCoupon = async () => {
+      try {
+        const r = await fetch('/coupon');
+        const d = await r.json();
+        activeCoupon = d.coupon;
+        if (removeCouponBtn) removeCouponBtn.style.display = activeCoupon ? 'inline-block' : 'none';
+      } catch { activeCoupon = null; }
+    };
+    let activeCoupon = null;
+
+    // ------------------- Rendering -------------------
     const clearCartDisplay = () => {
       if (cartItemsList) cartItemsList.innerHTML = '';
     };
@@ -86,13 +101,12 @@ document.addEventListener('DOMContentLoaded', function () {
       cartItemsList.appendChild(tr);
     };
 
-    const renderCartRows = () => {
-      if (!cartItemsList) return;
+    const renderCartRows = async () => {
+      await fetchCoupon();
       clearCartDisplay();
-      if (cart.length === 0) {
-        renderEmptyRow();
-        return;
-      }
+      if (cart.length === 0) { renderEmptyRow(); return; }
+
+      let subtotal = 0;
 
       cart.forEach(item => {
         const tr = document.createElement('tr');
@@ -148,8 +162,10 @@ document.addEventListener('DOMContentLoaded', function () {
         tr.appendChild(qtyTd);
 
         // Subtotal
+        const lineTotal = item.price * item.quantity;
+        subtotal += lineTotal;
         const subtotalTd = document.createElement('td');
-        subtotalTd.textContent = formatCurrency(item.price * item.quantity);
+        subtotalTd.textContent = formatCurrency(lineTotal);
         subtotalTd.className = 'cart-subtotal';
         tr.appendChild(subtotalTd);
 
@@ -170,7 +186,23 @@ document.addEventListener('DOMContentLoaded', function () {
         cartItemsList.appendChild(tr);
       });
 
-      // Total Row
+      // ---- Coupon discount row ----
+      if (activeCoupon) {
+        const discount = subtotal * activeCoupon.discount;
+        const discRow = document.createElement('tr');
+        const labelTd = document.createElement('td');
+        labelTd.setAttribute('colspan', '4');
+        labelTd.innerHTML = `<em>Coupon: ${activeCoupon.code} (-${activeCoupon.discount * 100}%)</em>`;
+        labelTd.style.textAlign = 'right';
+        const amtTd = document.createElement('td');
+        amtTd.setAttribute('colspan', '2');
+        amtTd.innerHTML = `<strong>-${formatCurrency(discount)}</strong>`;
+        discRow.append(labelTd, amtTd);
+        cartItemsList.appendChild(discRow);
+      }
+
+      // ---- Total row ----
+      const total = activeCoupon ? subtotal * (1 - activeCoupon.discount) : subtotal;
       const totalRow = document.createElement('tr');
       const labelTd = document.createElement('td');
       labelTd.setAttribute('colspan', '4');
@@ -178,9 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
       labelTd.style.textAlign = 'right';
       const totalTd = document.createElement('td');
       totalTd.setAttribute('colspan', '2');
-      totalTd.innerHTML = '<strong>' + formatCurrency(
-        cart.reduce((s, it) => s + (it.price * it.quantity), 0)
-      ) + '</strong>';
+      totalTd.innerHTML = `<strong>${formatCurrency(total)}</strong>`;
       totalRow.append(labelTd, totalTd);
       cartItemsList.appendChild(totalRow);
     };
@@ -189,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (menuToggle && navLinks) {
       menuToggle.addEventListener('click', () => {
         navLinks.classList.toggle('show');
-        menuToggle.textContent = navLinks.classList.contains('show') ? '×' : '☰';
+        menuToggle.textContent = navLinks.classList.contains('show') ? '×' : 'Menu';
       });
     }
 
@@ -222,7 +252,6 @@ document.addEventListener('DOMContentLoaded', function () {
       const imageUrl = imgEl ? imgEl.src : '';
 
       addToCart(foodId, foodName, price, imageUrl);
-      showAlert('Added to cart!', 'success');
       renderCartRows();
 
       setTimeout(() => window.location.href = btn.href, 100);
@@ -233,25 +262,36 @@ document.addEventListener('DOMContentLoaded', function () {
       cartBtn.addEventListener('click', () => {
         renderCartRows();
         updateCartCount();
-        if (cartPopup) cartPopup.style.display = 'block';
+        if (cartPopup) {
+          cartPopup.style.display = 'block';
+          // Remove animation class if it exists
+          cartPopup.style.animation = 'none';
+        }
       });
     }
 
     if (closeCartBtn) {
       closeCartBtn.addEventListener('click', () => {
-        if (cartPopup) cartPopup.style.display = 'none';
+        if (cartPopup) {
+          cartPopup.style.display = 'none';
+          cartPopup.style.animation = ''; // Reset for next open if needed
+        }
       });
     }
 
     if (cartPopup) {
       window.addEventListener('click', e => {
-        if (e.target === cartPopup) cartPopup.style.display = 'none';
+        if (e.target === cartPopup) {
+          cartPopup.style.display = 'none';
+          cartPopup.style.animation = '';
+        }
       });
     }
 
-    // Quantity buttons
+    // Quantity / Remove buttons
     if (cartItemsList) {
       cartItemsList.addEventListener('click', e => {
+        e.stopPropagation();
         const plus = e.target.closest('.qty-plus');
         const minus = e.target.closest('.qty-minus');
         const cancel = e.target.closest('.cancel-btn');
@@ -271,7 +311,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (cancel) {
           removeFromCart(cancel.dataset.foodId);
           renderCartRows();
-          showAlert('Item removed', 'info');
         }
       });
     }
@@ -298,25 +337,41 @@ document.addEventListener('DOMContentLoaded', function () {
     if (promoForm && couponInput && promoMessage) {
       promoForm.addEventListener('submit', async e => {
         e.preventDefault();
-        const code = couponInput.value.trim();
+        const code = couponInput.value.trim().toUpperCase();
         if (!code) {
-          showAlert('Please enter a coupon code.', 'error');
+          showAlert('Enter a coupon code.', 'error');
           return;
         }
-        try {
-          const res = await fetch('/apply_coupon', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ coupon_code: code })
-          });
-          const data = await res.json();
-          if (data.success) {
-            showAlert(`Coupon "${code}" applied! 20% off.`, 'success');
-          } else {
-            showAlert(data.message || 'Invalid coupon.', 'error');
-          }
-        } catch (err) {
-          showAlert('Error applying coupon.', 'error');
+
+        const payload = new URLSearchParams({ coupon_code: code });
+        const res = await fetch('/apply_coupon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: payload
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showAlert(`Coupon "${code}" applied! 20% off.`, 'success');
+        } else {
+          showAlert(data.message || 'Invalid coupon.', 'error');
+        }
+        couponInput.value = '';
+
+        // INSTANT UPDATE: Re-render cart immediately
+        if (cartPopup && cartPopup.style.display === 'block') {
+          await renderCartRows();
+        }
+      });
+    }
+
+    // Remove coupon button
+    if (removeCouponBtn) {
+      removeCouponBtn.addEventListener('click', async () => {
+        await fetch('/remove_coupon', { method: 'POST' });
+        showAlert('Coupon removed.', 'info');
+        if (cartPopup && cartPopup.style.display === 'block') {
+          await renderCartRows();
         }
       });
     }
@@ -348,12 +403,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
           let result;
           const text = await response.text();
-          try {
-            result = JSON.parse(text);
-          } catch (parseErr) {
-            console.error('JSON parse error:', parseErr, 'Response:', text);
-            throw new Error('Invalid response from server');
-          }
+          try { result = JSON.parse(text); }
+          catch { throw new Error('Invalid response'); }
 
           if (response.ok && result.success) {
             feedbackForm.reset();
@@ -386,14 +437,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
-        if (cartPopup) cartPopup.style.display = 'none';
+        if (cartPopup) {
+          cartPopup.style.display = 'none';
+          cartPopup.style.animation = '';
+        }
         if (feedbackPopup) feedbackPopup.style.display = 'none';
       }
     });
 
     // ------------------- Alert System -------------------
     function showAlert(message, type = 'info') {
-      // Remove old
       document.querySelectorAll('.custom-alert').forEach(el => el.remove());
 
       const alert = document.createElement('div');
@@ -410,7 +463,6 @@ document.addEventListener('DOMContentLoaded', function () {
       setTimeout(() => alert.remove(), 3000);
     }
 
-    // Fade-in animation
     const style = document.createElement('style');
     style.textContent = `
       @keyframes fadeIn { 
@@ -420,6 +472,10 @@ document.addEventListener('DOMContentLoaded', function () {
       .custom-alert { animation: fadeIn 0.3s ease; }
     `;
     document.head.appendChild(style);
+
+    // ------------------- Init -------------------
+    fetchCoupon();
+    updateCartCount();
 
   } catch (err) {
     console.error('App JS Error:', err);

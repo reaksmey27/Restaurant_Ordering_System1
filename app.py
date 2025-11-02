@@ -68,9 +68,7 @@ def home():
             LIMIT 3
         """)
         foods = cur.fetchall()
-        print("Foods:", foods)  # ← Debug in terminal
 
-        # Apply discount
         coupon = session.get('coupon')
         for f in foods:
             f['discounted_price'] = calculate_food_price(f, coupon)
@@ -227,16 +225,30 @@ def menu():
         cur.close()
     return render_template('menu.html', foods=foods, categories=categories, coupon=coupon)
 
-# ---------------- Coupon ----------------
+# ---------------- Coupon System (FIXED) ----------------
 @app.route('/apply_coupon', methods=['POST'])
 @login_required
 def apply_coupon():
     code = request.form.get('coupon_code', '').strip().upper()
     if code == "PNC":
-        session['coupon'] = {'code': code, 'discount': 0.2}
-        return jsonify(success=True, message="20% off applied!")
-    session.pop('coupon', None)
-    return jsonify(success=False, message="Invalid code.")
+        coupon = {'code': code, 'discount': 0.20}  # 20% off
+        session['coupon'] = coupon
+        return jsonify(success=True, message="20% off applied!", coupon=coupon)
+    else:
+        session.pop('coupon', None)
+        return jsonify(success=False, message="Invalid coupon code.")
+
+@app.route('/coupon', methods=['GET'])
+@login_required
+def get_coupon():
+    coupon = session.get('coupon')
+    return jsonify(coupon=coupon)
+
+@app.route('/remove_coupon', methods=['POST'])
+@login_required
+def remove_coupon():
+    removed = session.pop('coupon', None) is not None
+    return jsonify(success=removed, message="Coupon removed." if removed else "No coupon was active.")
 
 # ---------------- Order ----------------
 @app.route('/order/<int:food_id>', methods=['GET', 'POST'])
@@ -545,7 +557,6 @@ def manage_orders():
             cursor.close()
             return redirect(url_for('manage_orders'))
 
-    # Load orders
     try:
         cursor.execute("""
             SELECT o.*, f.food_name, f.image_url 
