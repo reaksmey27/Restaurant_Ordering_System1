@@ -125,7 +125,6 @@ body {
 
 .cart-content h3 {
     font-size: 24px;
-    /* was 1.5rem */
     color: #2f3542;
     margin-bottom: 20px;
     text-align: center;
@@ -177,6 +176,26 @@ body {
 #closeCartBtn:hover {
     background: #e84118;
     transform: translateY(-2px);
+}
+
+/* Remove Coupon Button – matches your red theme */
+#removeCouponBtn {
+    display: none;
+    margin-top: 12px;
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-weight: 600;
+    width: 100%;
+}
+
+#removeCouponBtn:hover {
+    background: #c82333;
 }
 
 .header {
@@ -292,14 +311,12 @@ body {
     color: #2f3542;
     margin-bottom: 8px;
     font-size: 21px;
-    /* was 1.3rem */
     font-weight: 600;
 }
 
 .category {
     color: #1e90ff;
     font-size: 14px;
-    /* was 0.9rem */
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
@@ -308,7 +325,6 @@ body {
 .price {
     color: #2ed573;
     font-size: 22px;
-    /* was 1.4rem */
     font-weight: bold;
     margin-bottom: 15px;
 }
@@ -394,7 +410,6 @@ body {
 
 .footer-section h3 {
     font-size: 29px;
-    /* was 1.8rem */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -409,14 +424,13 @@ body {
 }
 
 .footer-section ul li a {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.,0.8);
     text-decoration: none;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 15px;
-    /* was 0.95rem */
 }
 
 .footer-section ul li a:hover {
@@ -443,7 +457,6 @@ body {
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
     font-size: 19px;
-    /* was 1.2rem */
 }
 
 .social-links a:hover {
@@ -457,7 +470,6 @@ body {
     align-items: center;
     gap: 10px;
     font-size: 15px;
-    /* was 0.95rem */
     opacity: 0.9;
 }
 
@@ -478,7 +490,6 @@ body {
 
 .footer-date {
     font-size: 14px;
-    /* was 0.85rem */
     opacity: 0.7;
 }
 
@@ -493,7 +504,6 @@ body {
     color: white;
     font-weight: 600;
     font-size: 16px;
-    /* was 1rem */
     margin-right: 15px;
 }
 
@@ -524,7 +534,6 @@ body {
 }
 
 @keyframes gradientShift {
-
     0%,
     100% {
         background-position: 0% 50%;
@@ -534,7 +543,6 @@ body {
         background-position: 100% 50%;
     }
 }
-
 
 /* ---------- Promotion Section ---------- */
 .promotion {
@@ -584,7 +592,6 @@ body {
     font-weight: bold;
     color: green;
 }
-
 
 /* ------------------ Tablet (≤1024px) ------------------ */
 @media (max-width: 1024px) {

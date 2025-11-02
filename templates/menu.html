@@ -16,9 +16,9 @@
         <nav class="navbar">
             <div class="nav-container">
                 <h2 class="logo"><i>🍕 YumYum</i></h2>
-                <!-- 👇 New: Mobile Hamburger Button -->
+                <!-- Mobile Hamburger Button -->
                 <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
-                    ☰
+                    Menu
                 </button>
                 <div class="nav-links">
                     <a href="/">Home</a>
@@ -27,11 +27,11 @@
                     <a href="/order-list">Orders</a>
                     <a href="{{ url_for('logout') }}"><i class="bx bx-log-out"></i> Logout</a></li>
                     {% else %}
-                    <a href="/auth">Sign up</a>
+                    <a href="/auth">/hot Sign up</a>
                     <a href="/auth-admin">Admin</a>
                     {% endif %}
                     <button id="cartBtn" class="cart-btn">
-                        🛒 Cart (<span id="cartCount">0</span>)
+                        Cart (<span id="cartCount">0</span>)
                     </button>
                 </div>
             </div>
@@ -56,6 +56,10 @@
                     </thead>
                     <tbody id="cartItems"></tbody>
                 </table>
+
+                <!-- ADD THIS LINE ONLY -->
+                <button id="removeCouponBtn" style="display:none; margin-top:10px;">Remove Coupon</button>
+
                 <button id="closeCartBtn">Close</button>
             </div>
         </div>
@@ -66,20 +70,20 @@
 
         <!-- Promotion Section -->
         <section class="promotion">
-            <h2>🎉 Special Promotion!</h2>
+            <h2>Special Promotion!</h2>
             <p>Use coupon code <strong>PNC</strong> to get 20% off your order today!</p>
             <form id="promoForm">
                 <input type="text" placeholder="Enter coupon code" name="coupon_code" id="couponInput">
                 <button type="submit">Apply</button>
             </form>
             <p id="promoMessage" class="promo-message">
-                {% if coupon %}✅ Coupon "{{ coupon.code }}" applied! {{ coupon.discount*100 }}% off{% endif %}
+                {% if coupon %}Coupon "{{ coupon.code }}" applied! {{ coupon.discount*100 }}% off{% endif %}
             </p>
         </section>
 
         <!-- Header -->
         <section class="header">
-            <h1>🍽️ Our Delicious Menu</h1>
+            <h1>Our Delicious Menu</h1>
             <p>Choose your favorite meal and order it instantly.</p>
         </section>
 
@@ -120,7 +124,7 @@
                 </div>
             </div>
             {% else %}
-            <p class="no-items">No food items found 😅</p>
+            <p class="no-items">No food items found</p>
             {% endfor %}
         </div>
 
@@ -131,7 +135,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>🍕 YumYum</h3>
+                    <h3>YumYum</h3>
                     <p>Authentic Khmer & Asian cuisine with fresh ingredients. Fast delivery, great taste, every time!
                     </p>
                     <div class="social-links">
@@ -143,27 +147,27 @@
                 <div class="footer-section">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="{{ url_for('home') }}">🏠 Home</a></li>
-                        <li><a href="{{ url_for('menu') }}">🍽 Menu</a></li>
-                        <li><a href="{{ url_for('order_list') }}">🧾 Orders</a></li>
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
+                        <li><a href="{{ url_for('menu') }}">Menu</a></li>
+                        <li><a href="{{ url_for('order_list') }}">Orders</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Services</h4>
                     <ul>
-                        <li><a href="#">🚚 Delivery</a></li>
-                        <li><a href="#">🏪 Dine-in</a></li>
-                        <li><a href="#">📦 Takeaway</a></li>
-                        <li><a href="#">🎉 Events</a></li>
+                        <li><a href="#">Delivery</a></li>
+                        <li><a href="#">Dine-in</a></li>
+                        <li><a href="#">Takeaway</a></li>
+                        <li><a href="#">Events</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>📞 Contact Us</h4>
+                    <h4>Contact Us</h4>
                     <div class="contact-info">
-                        <p><i>📍</i> 123 Khmer Street, Phnom Penh</p>
-                        <p><i>📱</i> +855 23 123 456</p>
-                        <p><i>✉️</i> hello@yumyum.com.kh</p>
-                        <p><i>🕒</i> Open 7AM - 10PM Daily</p>
+                        <p>123 Khmer Street, Phnom Penh</p>
+                        <p>+855 23 123 456</p>
+                        <p>hello@yumyum.com.kh</p>
+                        <p>Open 7AM - 10PM Daily</p>
                     </div>
                 </div>
             </div>
@@ -174,10 +178,10 @@
                 </div>
                 <div class="footer-right">
                     <div class="payment-methods">
-                        <span>💳 We Accept:</span>
+                        <span>We Accept:</span>
                         <img src="/static/images/payment-visa.png" alt="Visa" class="payment-icon">
                         <img src="/static/images/payment-mastercard.png" alt="Mastercard" class="payment-icon">
-                        <img src="/static/images/payment-aba.png" alt="Wing" class="payment-icon">
+                        <img src="/static/images/payment-aba.png" class="payment-icon">
                         <img src="/static/images/payment-acleda.png" alt="Cash" class="payment-icon">
                     </div>
                 </div>
