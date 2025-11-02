@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Success - Order #{{ order.order_id }}</title>
+    <link rel="stylesheet" href="/static/css/payment_success.css">
+</head>
+
+<body>
+    <div class="receipt-container">
+        <h1>✅ Payment Successful!</h1>
+        <p id="thank">Thank you <strong>{{ order.customer_name }}</strong>! Your order has been confirmed.</p>
+
+        {% if order.image_url %}
+        <img src="{{ order.image_url }}" alt="{{ order.food_name }}" class="food-image">
+        {% endif %}
+
+        <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+        <p><strong>Phone:</strong> {{ order.phone }}</p>
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <p><strong>Delivery:</strong> {{ order.delivery_option }} via {{ order.delivery_service }}</p>
+        <hr>
+        <table>
+            <thead>
+                <tr>
+                    <th>Food</th>
+                    <th>Quantity</th>
+                    <th>Unit Price ($)</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ order.food_name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>${{ "%.2f"|format(order.total_price / order.quantity) }}</td>
+                    <td>${{ "%.2f"|format(order.total_price) }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <hr>
+        <p><strong>Paid By:</strong> {{ order.payment_method }}</p>
+        <p><strong>Payment Date:</strong> {{ order.payment_date.strftime("%Y-%m-%d %H:%M") }}</p>
+
+        <div class="button">
+            <a href="{{ url_for('order_list') }}" class="btn-back">🧾 Back to Orders</a>
+            <a href="{{ url_for('menu') }}" class="btn-pay">🍽 Back to Menu</a>
+        </div>
+    </div>
+</body>
+
+</html>

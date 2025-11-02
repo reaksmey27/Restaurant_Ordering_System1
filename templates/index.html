@@ -15,14 +15,19 @@
         <nav class="navbar">
             <div class="nav-container">
                 <h2 class="logo"><i>🍕 YumYum</i></h2>
+                <!-- 👇 New: Mobile Hamburger Button -->
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+                    ☰
+                </button>
                 <div class="nav-links">
                     <a href="/" class="active">Home</a>
                     <a href="/menu">Menu</a>
                     {% if session.get('username') %}
                     <a href="/order-list">Orders</a>
-                    <a href="/logout">Logout</a>
+                    <a href="{{ url_for('logout') }}"><i class="bx bx-log-out"></i> Logout</a></li>
                     {% else %}
                     <a href="/auth">Sign up</a>
+                    <a href="/auth-admin">Admin</a>
                     {% endif %}
                     <button id="cartBtn" class="cart-btn">
                         🛒 Cart (<span id="cartCount">0</span>)
@@ -76,41 +81,42 @@
     <main>
         <section class="featured">
             <div class="container">
-                <h2>🍔 Popular Items</h2>
+                <h2>Popular Items</h2>
 
-                <!-- Food Cards Grid -->
                 <div class="menu-container">
+                    {% if foods %}
                     {% for food in foods %}
                     <div class="food-card">
-                        <img src="{{ food.image_url }}" alt="{{ food.food_name }}">
+                        <img src="{{ food.image_url or 'https://via.placeholder.com/300x200?text=' + food.food_name }}"
+                            alt="{{ food.food_name }}"
+                            onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
                         <div class="food-info">
                             <h2>{{ food.food_name }}</h2>
                             <p class="category">{{ food.category }}</p>
                             <p class="price">
-                                {% if food.get('discounted_price') and food.discounted_price != food.price %}
-                                <span class="original-price" style="text-decoration: line-through;">${{ food.price }}</span>
-                                <span class="discounted-price">${{ food.discounted_price }}</span>
+                                {% if food.discounted_price and food.discounted_price != food.price %}
+                                <span class="original-price">${{ '%.2f'|format(food.price) }}</span>
+                                <span class="discounted-price">${{ '%.2f'|format(food.discounted_price) }}</span>
                                 {% else %}
-                                ${{ food.price }}
+                                ${{ '%.2f'|format(food.price) }}
                                 {% endif %}
                             </p>
-                            <a href="{{ url_for('order', food_id=food.food_id) }}">
-                                <button class="order-btn">Order Now</button>
+                            <a href="{{ url_for('order', food_id=food.food_id) }}" class="order-btn">
+                                Order Now
                             </a>
                         </div>
                     </div>
-                    {% else %}
-                    <p class="no-items">No food items found 😅</p>
                     {% endfor %}
+                    {% else %}
+                    <p class="no-items">No food items found</p>
+                    {% endif %}
                 </div>
 
-                <!-- View All Button -->
                 <div class="view-all">
-                    <a href="{{ url_for('menu') }}" class="cta-btn secondary">View Full Menu →</a>
+                    <a href="{{ url_for('menu') }}" class="cta-btn secondary">View Full Menu</a>
                 </div>
             </div>
         </section>
-
 
         <!-- Quick Stats -->
         <section class="stats">
@@ -131,6 +137,42 @@
                 </div>
             </div>
         </section>
+        <!-- Feedback and Map Section -->
+        <section class="feedback-map">
+            <div class="container">
+                <h2>💬 We’d Love Your Feedback!</h2>
+                <p>Share your thoughts and find our restaurant easily below.</p>
+
+                <div class="feedback-map-grid">
+                    <!-- Feedback Form -->
+                    <form id="feedbackForm" class="feedback-form">
+                        <h3>Feedback</h3>
+                        <input type="text" name="name" placeholder="Your Name" required>
+                        <input type="email" name="email" placeholder="Your Email" required>
+                        <textarea name="message" placeholder="Your Feedback" required></textarea>
+                        <button type="submit" id="submitBtn">
+                            Send Feedback <span id="loadingSpinner" class="spinner" style="display:none;"></span>
+                        </button>
+                    </form>
+
+                    <!-- Popup -->
+                    <div id="feedbackPopup" class="popup">
+                        <div class="popup-content">
+                            <p>✅ Thank you for your feedback!</p>
+                            <button id="closePopup">Close</button>
+                        </div>
+                    </div>
+
+
+                    <!-- Map Iframe -->
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.481434918377!2d104.8885!3d11.5621!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3109516b0bdfc4e3%3A0x2a5dc977f84714de!2sPhnom%20Penh%2C%20Cambodia!5e0!3m2!1sen!2skh!4v1700000000000!5m2!1sen!2skh"
+                        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Detailed Footer -->

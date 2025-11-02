@@ -35,6 +35,20 @@ body {
     font-weight: 600;
 }
 
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.menu-toggle:hover {
+    transform: scale(1.1);
+}
+
 .nav-links {
     display: flex;
     align-items: center;
@@ -299,15 +313,16 @@ body {
     margin-bottom: 15px;
 }
 
-    /* Discount price styling */
-    .price .original-price {
-        color: #e84118;
-        margin-right: 8px;
-    }
-    .price .discounted-price {
-        color: #2ed573;
-        font-weight: 700;
-    }
+/* Discount price styling */
+.price .original-price {
+    color: #e84118;
+    margin-right: 8px;
+}
+
+.price .discounted-price {
+    color: #2ed573;
+    font-weight: 700;
+}
 
 .order-btn {
     background: linear-gradient(135deg, #ff4757, #e84118);
@@ -333,7 +348,6 @@ body {
     grid-column: 1 / -1;
     margin: 60px 0;
     font-size: 19px;
-    /* was 1.2rem */
 }
 
 .footer {
@@ -569,4 +583,145 @@ body {
     margin-top: 10px;
     font-weight: bold;
     color: green;
+}
+
+
+/* ------------------ Tablet (≤1024px) ------------------ */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 15px;
+    }
+
+    .cart-content {
+        width: 80%;
+        margin: 60px auto;
+        padding: 20px;
+        max-height: 75vh;
+    }
+
+    #cartTable th,
+    #cartTable td {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+
+    #cartTable td img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .cancel-btn,
+    #closeCartBtn {
+        padding: 10px 16px;
+    }
+
+    .menu-container {
+        gap: 25px;
+    }
+
+    .food-card {
+        max-width: 280px;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .filter-bar input[type="text"],
+    .filter-bar select,
+    .filter-bar button {
+        width: 100%;
+    }
+
+    .cart-content {
+        max-width: 500px;
+        margin: 60px auto;
+    }
+
+    .promotion {
+        width: 90%;
+        padding: 25px;
+    }
+}
+
+/* ------------------ Mobile (≤768px) ------------------ */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .nav-links {
+        position: absolute;
+        top: 65px;
+        left: 0;
+        width: 100%;
+        flex-direction: column;
+        background: #ff4757;
+        display: none;
+        gap: 0;
+        padding: 10px 0;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+
+    .nav-links a {
+        padding: 12px 0;
+        font-size: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    #cartTable th,
+    #cartTable td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+
+    #cartTable td img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .cancel-btn,
+    #closeCartBtn {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .menu-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 15px;
+    }
+
+    .food-card {
+        max-width: 100%;
+    }
+
+    .cart-content {
+        width: 95%;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .filter-bar input[type="text"],
+    .filter-bar select,
+    .filter-bar button {
+        font-size: 14px;
+    }
+
+    .promotion input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .promotion button {
+        width: 100%;
+        margin-left: 0;
+    }
 }

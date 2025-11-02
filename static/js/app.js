@@ -1,245 +1,427 @@
 document.addEventListener('DOMContentLoaded', function () {
   try {
-    // ------------------- Cart state -------------------
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    // ------------------- State -------------------
+    const STORAGE_KEY = 'cart';
+    let cart = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-    // DOM refs (guarded)
+    // DOM refs
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.querySelector('.nav-links');
     const cartBtn = document.getElementById('cartBtn');
     const cartPopup = document.getElementById('cartPopup');
     const closeCartBtn = document.getElementById('closeCartBtn');
     const cartItemsList = document.getElementById('cartItems');
     const cartCountElement = document.getElementById('cartCount');
     const container = document.getElementById('container');
+    const promoForm = document.getElementById('promoForm');
+    const couponInput = document.getElementById('couponInput');
+    const promoMessage = document.getElementById('promoMessage');
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackPopup = document.getElementById('feedbackPopup');
+    const closePopup = document.getElementById('closePopup');
 
     // ------------------- Helpers -------------------
-    function saveCart() {
-      localStorage.setItem('cart', JSON.stringify(cart));
-    }
-
-    function updateCartDisplay() {
-      if (!cartCountElement) return;
-      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-      cartCountElement.textContent = totalItems;
-    }
-
-    function addToCart(foodId, foodName, price, imageUrl) {
-      // normalize id to string for consistent comparisons
-      const id = String(foodId);
-      const existing = cart.find(i => String(i.food_id) === id);
-      if (existing) existing.quantity = (existing.quantity || 0) + 1;
-      else cart.push({ food_id: id, food_name: foodName, price: Number(price) || 0, quantity: 1, image_url: imageUrl || '' });
-      saveCart();
-    }
-
-    function removeFromCart(foodId) {
-      const id = String(foodId);
-      const idx = cart.findIndex(i => String(i.food_id) === id);
-      if (idx !== -1) {
-        cart.splice(idx, 1);
-        saveCart();
+    const saveCart = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    const formatCurrency = n => {
+      try { return '$' + Number(n).toFixed(2); } 
+      catch { return '$0.00'; }
+    };
+    const findItemIndexById = id => cart.findIndex(i => String(i.food_id) === String(id));
+    const updateCartCount = () => {
+      if (cartCountElement) {
+        cartCountElement.textContent = cart.reduce((sum, i) => sum + Number(i.quantity || 0), 0);
       }
-    }
+    };
 
-    function displayCartItems() {
+    const addToCart = (foodId, foodName, price, imageUrl) => {
+      const idx = findItemIndexById(foodId);
+      if (idx >= 0) {
+        cart[idx].quantity = (Number(cart[idx].quantity) || 0) + 1;
+      } else {
+        cart.push({
+          food_id: String(foodId),
+          food_name: String(foodName || 'Item'),
+          price: Number(price) || 0,
+          quantity: 1,
+          image_url: String(imageUrl || '')
+        });
+      }
+      saveCart();
+      updateCartCount();
+      window.dispatchEvent(new Event('storage'));
+    };
+
+    const removeFromCart = id => {
+      cart = cart.filter(i => String(i.food_id) !== String(id));
+      saveCart();
+      updateCartCount();
+      window.dispatchEvent(new Event('storage'));
+    };
+
+    const setQuantity = (id, qty) => {
+      const idx = findItemIndexById(id);
+      if (idx < 0) return;
+      cart[idx].quantity = Math.max(0, Math.floor(Number(qty) || 0));
+      if (cart[idx].quantity === 0) cart.splice(idx, 1);
+      saveCart();
+      updateCartCount();
+      window.dispatchEvent(new Event('storage'));
+    };
+
+    const clearCartDisplay = () => {
+      if (cartItemsList) cartItemsList.innerHTML = '';
+    };
+
+    const renderEmptyRow = () => {
       if (!cartItemsList) return;
-      cartItemsList.innerHTML = '';
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.setAttribute('colspan', '6');
+      td.textContent = 'Your cart is empty';
+      td.style.textAlign = 'center';
+      td.style.padding = '20px';
+      td.style.fontStyle = 'italic';
+      td.style.color = '#888';
+      tr.appendChild(td);
+      cartItemsList.appendChild(tr);
+    };
+
+    const renderCartRows = () => {
+      if (!cartItemsList) return;
+      clearCartDisplay();
       if (cart.length === 0) {
-        cartItemsList.innerHTML = '<tr><td colspan="6">Your cart is empty</td></tr>';
+        renderEmptyRow();
         return;
       }
 
       cart.forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td><img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.food_name)}" style="width:60px;height:40px;object-fit:cover;"></td>
-          <td>${escapeHtml(item.food_name)}</td>
-          <td>$${Number(item.price || 0).toFixed(2)}</td>
-          <td>${Number(item.quantity || 0)}</td>
-          <td>$${(Number(item.price || 0) * Number(item.quantity || 0)).toFixed(2)}</td>
-          <td><button class="cancel-btn" data-food-id="${escapeHtml(item.food_id)}">Cancel</button></td>
-        `;
-        cartItemsList.appendChild(row);
+        const tr = document.createElement('tr');
+
+        // Image
+        const imgTd = document.createElement('td');
+        const img = document.createElement('img');
+        img.src = item.image_url || 'https://via.placeholder.com/60x40?text=Food';
+        img.alt = item.food_name;
+        img.style.width = '60px';
+        img.style.height = '40px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '4px';
+        imgTd.appendChild(img);
+        tr.appendChild(imgTd);
+
+        // Name
+        const nameTd = document.createElement('td');
+        nameTd.textContent = item.food_name;
+        nameTd.style.maxWidth = '150px';
+        nameTd.style.whiteSpace = 'nowrap';
+        nameTd.style.overflow = 'hidden';
+        nameTd.style.textOverflow = 'ellipsis';
+        tr.appendChild(nameTd);
+
+        // Price
+        const priceTd = document.createElement('td');
+        priceTd.textContent = formatCurrency(item.price);
+        tr.appendChild(priceTd);
+
+        // Quantity
+        const qtyTd = document.createElement('td');
+        const minusBtn = document.createElement('button');
+        minusBtn.type = 'button';
+        minusBtn.className = 'qty-minus';
+        minusBtn.dataset.foodId = item.food_id;
+        minusBtn.textContent = '−';
+        minusBtn.style.padding = '0 8px';
+        minusBtn.style.fontWeight = 'bold';
+        const qtySpan = document.createElement('span');
+        qtySpan.className = 'qty-value';
+        qtySpan.textContent = item.quantity;
+        qtySpan.style.margin = '0 8px';
+        qtySpan.style.fontWeight = 'bold';
+        const plusBtn = document.createElement('button');
+        plusBtn.type = 'button';
+        plusBtn.className = 'qty-plus';
+        plusBtn.dataset.foodId = item.food_id;
+        plusBtn.textContent = '+';
+        plusBtn.style.padding = '0 8px';
+        plusBtn.style.fontWeight = 'bold';
+        qtyTd.append(minusBtn, qtySpan, plusBtn);
+        tr.appendChild(qtyTd);
+
+        // Subtotal
+        const subtotalTd = document.createElement('td');
+        subtotalTd.textContent = formatCurrency(item.price * item.quantity);
+        subtotalTd.className = 'cart-subtotal';
+        tr.appendChild(subtotalTd);
+
+        // Remove
+        const cancelTd = document.createElement('td');
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'cancel-btn';
+        cancelBtn.dataset.foodId = item.food_id;
+        cancelBtn.textContent = 'Remove';
+        cancelBtn.style.color = '#dc3545';
+        cancelBtn.style.background = 'none';
+        cancelBtn.style.border = 'none';
+        cancelBtn.style.cursor = 'pointer';
+        cancelTd.appendChild(cancelBtn);
+        tr.appendChild(cancelTd);
+
+        cartItemsList.appendChild(tr);
+      });
+
+      // Total Row
+      const totalRow = document.createElement('tr');
+      const labelTd = document.createElement('td');
+      labelTd.setAttribute('colspan', '4');
+      labelTd.innerHTML = '<strong>Total</strong>';
+      labelTd.style.textAlign = 'right';
+      const totalTd = document.createElement('td');
+      totalTd.setAttribute('colspan', '2');
+      totalTd.innerHTML = '<strong>' + formatCurrency(
+        cart.reduce((s, it) => s + (it.price * it.quantity), 0)
+      ) + '</strong>';
+      totalRow.append(labelTd, totalTd);
+      cartItemsList.appendChild(totalRow);
+    };
+
+    // ------------------- Menu Toggle -------------------
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('show');
+        menuToggle.textContent = navLinks.classList.contains('show') ? '×' : '☰';
       });
     }
 
-    // Simple escape for inserted HTML (prevents accidental injection)
-    function escapeHtml(str) {
-      if (str == null) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    }
-
-    // ------------------- Order button handling (delegation) -------------------
-    // Use delegation so dynamically-rendered cards still work.
-    document.addEventListener('click', function (evt) {
-      const btn = evt.target.closest && evt.target.closest('.order-btn');
+    // ------------------- Add to Cart from Order Button -------------------
+    document.addEventListener('click', evt => {
+      const btn = evt.target.closest('.order-btn');
       if (!btn) return;
-
       evt.preventDefault();
 
-      // Prefer data attributes on the button or its food-card ancestor
       const foodCard = btn.closest('.food-card');
       if (!foodCard) return;
 
-      // Try data-food-id attribute on button then on ancestor, fallback to parsing href from anchor
-      let foodId = btn.dataset.foodId || (foodCard.dataset && foodCard.dataset.foodId) || null;
+      const href = btn.href || '';
+      const match = href.match(/\/order\/(\d+)/);
+      const foodId = match ? match[1] : null;
+      if (!foodId) return;
 
-      if (!foodId) {
-        // check for ancestor anchor with /order/<id>
-        const link = btn.closest('a');
-        const href = link ? link.getAttribute('href') : null;
-        if (href) {
-          const m = href.match(/\/order\/(\d+)/);
-          if (m) foodId = m[1];
-        }
-      }
-
-      const nameEl = foodCard.querySelector('h2') || foodCard.querySelector('.food-name');
+      const nameEl = foodCard.querySelector('h2');
       const foodName = nameEl ? nameEl.textContent.trim() : 'Item';
 
-      // price element: prefer .discounted-price then use data-original, then fallback to text content
       let price = 0;
       const priceEl = foodCard.querySelector('.price');
       if (priceEl) {
-        const discEl = priceEl.querySelector('.discounted-price');
-        if (discEl) price = parseFloat(discEl.textContent.replace(/[^0-9.\-]/g, '')) || 0;
-        else if (priceEl.dataset && priceEl.dataset.original) price = parseFloat(priceEl.dataset.original) || 0;
-        else price = parseFloat(priceEl.textContent.replace(/[^0-9.\-]/g, '')) || 0;
+        const disc = priceEl.querySelector('.discounted-price');
+        price = disc ? parseFloat(disc.textContent.replace(/[^0-9.]/g, '')) : 0;
+        if (!price) price = parseFloat(priceEl.textContent.replace(/[^0-9.]/g, '')) || 0;
       }
 
-      const imageEl = foodCard.querySelector('img');
-      const imageUrl = imageEl ? imageEl.getAttribute('src') : '';
+      const imgEl = foodCard.querySelector('img');
+      const imageUrl = imgEl ? imgEl.src : '';
 
-      if (foodId) addToCart(foodId, foodName, price, imageUrl);
-      updateCartDisplay();
-      displayCartItems();
+      addToCart(foodId, foodName, price, imageUrl);
+      showAlert('Added to cart!', 'success');
+      renderCartRows();
 
-      // if there is an anchor parent, navigate after a tiny delay to ensure localStorage is saved
-      const parentAnchor = btn.closest('a');
-      if (parentAnchor && parentAnchor.href) {
-        // small timeout ensures localStorage write completes (usually synchronous, but keep UX smooth)
-        setTimeout(() => { window.location.href = parentAnchor.href; }, 50);
-      }
+      setTimeout(() => window.location.href = btn.href, 100);
     });
 
-    // ------------------- Cart popup handlers -------------------
-    if (cartBtn && cartPopup) {
-      cartBtn.addEventListener('click', function () {
-        displayCartItems();
-        cartPopup.style.display = 'block';
+    // ------------------- Cart Popup -------------------
+    if (cartBtn) {
+      cartBtn.addEventListener('click', () => {
+        renderCartRows();
+        updateCartCount();
+        if (cartPopup) cartPopup.style.display = 'block';
       });
     }
 
-    if (closeCartBtn && cartPopup) {
-      closeCartBtn.addEventListener('click', function () { cartPopup.style.display = 'none'; });
+    if (closeCartBtn) {
+      closeCartBtn.addEventListener('click', () => {
+        if (cartPopup) cartPopup.style.display = 'none';
+      });
     }
 
-    // close when clicking outside popup content (overlay)
-    window.addEventListener('click', function (evt) {
-      if (!cartPopup) return;
-      if (evt.target === cartPopup) cartPopup.style.display = 'none';
-    });
+    if (cartPopup) {
+      window.addEventListener('click', e => {
+        if (e.target === cartPopup) cartPopup.style.display = 'none';
+      });
+    }
 
-    // handle cancel buttons inside cart using delegation
+    // Quantity buttons
     if (cartItemsList) {
-      cartItemsList.addEventListener('click', function (evt) {
-        const btn = evt.target.closest && evt.target.closest('.cancel-btn');
-        if (!btn) return;
-        const id = btn.getAttribute('data-food-id');
-        if (!id) return;
-        removeFromCart(id);
-        displayCartItems();
-        updateCartDisplay();
+      cartItemsList.addEventListener('click', e => {
+        const plus = e.target.closest('.qty-plus');
+        const minus = e.target.closest('.qty-minus');
+        const cancel = e.target.closest('.cancel-btn');
+
+        if (plus) {
+          const id = plus.dataset.foodId;
+          const idx = findItemIndexById(id);
+          if (idx >= 0) setQuantity(id, cart[idx].quantity + 1);
+          renderCartRows();
+        }
+        if (minus) {
+          const id = minus.dataset.foodId;
+          const idx = findItemIndexById(id);
+          if (idx >= 0) setQuantity(id, cart[idx].quantity - 1);
+          renderCartRows();
+        }
+        if (cancel) {
+          removeFromCart(cancel.dataset.foodId);
+          renderCartRows();
+          showAlert('Item removed', 'info');
+        }
       });
     }
 
-    // Initial display update
-    updateCartDisplay();
+    // ------------------- Multi-tab Sync -------------------
+    window.addEventListener('storage', () => {
+      cart = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      updateCartCount();
+      if (cartPopup && cartPopup.style.display === 'block') renderCartRows();
+    });
 
-    // ------------------- Auth panel toggle -------------------
+    // Initial render
+    updateCartCount();
+
+    // ------------------- Auth Toggle -------------------
     if (container) {
-      const signUpButton = document.getElementById('signUp');
-      const signInButton = document.getElementById('signIn');
-
-      if (signUpButton) {
-        signUpButton.addEventListener('click', () => container.classList.add('right-panel-active'));
-      }
-      if (signInButton) {
-        signInButton.addEventListener('click', () => container.classList.remove('right-panel-active'));
-      }
-
-      // Auto-switch based on flash classes present in DOM
-      if (document.querySelector('.register_error') || document.querySelector('.register_success')) {
-        container.classList.add('right-panel-active');
-      }
-      if (document.querySelector('.login_error')) {
-        container.classList.remove('right-panel-active');
-      }
+      const signUp = document.getElementById('signUp');
+      const signIn = document.getElementById('signIn');
+      if (signUp) signUp.addEventListener('click', () => container.classList.add('right-panel-active'));
+      if (signIn) signIn.addEventListener('click', () => container.classList.remove('right-panel-active'));
     }
 
-    // ------------------- Coupon handler -------------------
-    const promoForm = document.getElementById('promoForm');
-    const couponInput = document.getElementById('couponInput');
-    const promoMessage = document.getElementById('promoMessage');
-
+    // ------------------- Coupon -------------------
     if (promoForm && couponInput && promoMessage) {
-      promoForm.addEventListener('submit', async (e) => {
+      promoForm.addEventListener('submit', async e => {
         e.preventDefault();
         const code = couponInput.value.trim();
         if (!code) {
-          promoMessage.textContent = '❌ Please enter a coupon code.';
+          showAlert('Please enter a coupon code.', 'error');
           return;
         }
         try {
-          const response = await fetch('/apply_coupon', {
+          const res = await fetch('/apply_coupon', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ coupon_code: code })
           });
-          const data = await response.json();
+          const data = await res.json();
           if (data.success) {
-            promoMessage.textContent = `✅ Coupon "${code}" applied! 20% off will be applied.`;
-
-            // Update prices on menu: use dataset-original if present, otherwise attempt to parse.
-            document.querySelectorAll('.food-card').forEach(card => {
-              const priceEl = card.querySelector('.price');
-              if (!priceEl) return;
-
-              let original = null;
-              if (priceEl.dataset && priceEl.dataset.original) {
-                original = parseFloat(priceEl.dataset.original);
-              } else {
-                // try to find numeric value from displayed content (strip non-numeric)
-                const txt = priceEl.textContent || '';
-                original = parseFloat(txt.replace(/[^0-9.\-]/g, '')) || null;
-              }
-
-              if (original != null && !Number.isNaN(original)) {
-                const discountedPrice = (original * 0.8).toFixed(2);
-                priceEl.innerHTML = `
-                  <span class="original-price" style="text-decoration: line-through;">$${Number(original).toFixed(2)}</span>
-                  <span class="discounted-price">$${discountedPrice}</span>
-                `;
-                // ensure dataset.original remains consistent for future toggles
-                priceEl.dataset.original = Number(original).toFixed(2);
-              }
-            });
+            showAlert(`Coupon "${code}" applied! 20% off.`, 'success');
           } else {
-            promoMessage.textContent = `❌ ${data.message || 'Invalid coupon code.'}`;
+            showAlert(data.message || 'Invalid coupon.', 'error');
           }
         } catch (err) {
-          promoMessage.textContent = '❌ Error applying coupon. Try again.';
-          console.error('Coupon error', err);
+          showAlert('Error applying coupon.', 'error');
         }
       });
     }
 
+    // ------------------- Feedback (Fixed & Safe) -------------------
+    if (feedbackForm) {
+      feedbackForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const formData = new FormData(feedbackForm);
+        const name = formData.get('name')?.trim();
+        const email = formData.get('email')?.trim();
+        const message = formData.get('message')?.trim();
+
+        if (!name || !email || !message) {
+          showAlert('Please fill in all fields.', 'error');
+          return;
+        }
+
+        const submitBtn = feedbackForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = 'Sending...';
+        submitBtn.disabled = true;
+
+        try {
+          const response = await fetch('/submit_feedback', {
+            method: 'POST',
+            body: formData
+          });
+
+          let result;
+          const text = await response.text();
+          try {
+            result = JSON.parse(text);
+          } catch (parseErr) {
+            console.error('JSON parse error:', parseErr, 'Response:', text);
+            throw new Error('Invalid response from server');
+          }
+
+          if (response.ok && result.success) {
+            feedbackForm.reset();
+            showAlert('Thank you for your feedback!', 'success');
+            if (feedbackPopup) feedbackPopup.style.display = 'block';
+          } else {
+            showAlert(result.error || 'Failed to send feedback.', 'error');
+          }
+        } catch (err) {
+          console.error('Feedback error:', err);
+          showAlert('Network error. Please try again.', 'error');
+        } finally {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    if (closePopup && feedbackPopup) {
+      closePopup.addEventListener('click', () => {
+        feedbackPopup.style.display = 'none';
+      });
+    }
+
+    if (feedbackPopup) {
+      window.addEventListener('click', e => {
+        if (e.target === feedbackPopup) feedbackPopup.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (cartPopup) cartPopup.style.display = 'none';
+        if (feedbackPopup) feedbackPopup.style.display = 'none';
+      }
+    });
+
+    // ------------------- Alert System -------------------
+    function showAlert(message, type = 'info') {
+      // Remove old
+      document.querySelectorAll('.custom-alert').forEach(el => el.remove());
+
+      const alert = document.createElement('div');
+      alert.className = 'custom-alert';
+      alert.textContent = message;
+      alert.style.cssText = `
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+        padding: 12px 24px; border-radius: 8px; color: white; font-weight: bold; z-index: 9999;
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 14px;
+        animation: fadeIn 0.3s ease;
+      `;
+      document.body.appendChild(alert);
+      setTimeout(() => alert.remove(), 3000);
+    }
+
+    // Fade-in animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn { 
+        from { opacity: 0; transform: translateX(-50%) translateY(-10px); } 
+        to { opacity: 1; transform: translateX(-50%) translateY(0); } 
+      }
+      .custom-alert { animation: fadeIn 0.3s ease; }
+    `;
+    document.head.appendChild(style);
+
   } catch (err) {
-    // top-level safety
-    console.error('Cart script error:', err);
+    console.error('App JS Error:', err);
   }
 });
