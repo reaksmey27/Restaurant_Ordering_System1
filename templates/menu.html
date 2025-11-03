@@ -21,18 +21,16 @@
                     Menu
                 </button>
                 <div class="nav-links">
-                    <a href="/">Home</a>
-                    <a href="/menu" class="active">Menu</a>
+                    <a href="/"><i class="bx bx-home"></i> Home</a>
+                    <a href="/menu"  class="active"><i class="bx bx-book-open"></i> Menu</a>
                     {% if session.get('username') %}
-                    <a href="/order-list">Orders</a>
-                    <a href="{{ url_for('logout') }}"><i class="bx bx-log-out"></i> Logout</a></li>
+                    <a href="/order-list"><i class="bx bx-list-check"></i> Orders</a>
+                    <a href="{{ url_for('logout') }}"><i class="bx bx-log-out"></i> Logout</a>
                     {% else %}
-                    <a href="/auth">/hot Sign up</a>
-                    <a href="/auth-admin">Admin</a>
+                    <a href="/auth"><i class="bx bx-user-plus"></i> Sign up</a>
+                    <a href="/auth-admin"><i class="bx bx-user-voice"></i> Admin</a>
                     {% endif %}
-                    <button id="cartBtn" class="cart-btn">
-                        Cart (<span id="cartCount">0</span>)
-                    </button>
+                    <button id="cartBtn" class="cart-btn"> 🛒 Cart (<span id="cartCount">0</span>) </button>
                 </div>
             </div>
         </nav>

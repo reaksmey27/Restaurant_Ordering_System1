@@ -86,6 +86,10 @@ body {
     opacity: 0.8;
 }
 
+.nav-links a i {
+  font-size: 20px;
+}
+
 .cart-btn {
     background: white;
     color: #ff4757;
