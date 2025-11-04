@@ -1,0 +1,17 @@
+Flask==3.0.3
+flask-mysqldb==2.0.0
+mysqlclient==2.2.4
+Werkzeug==3.0.2
+Jinja2==3.1.4
+itsdangerous==2.2.0
+click==8.1.7
+
+# Utility
+python-dotenv==1.0.1
+
+# For logging, security, and datetime (already in stdlib but listed for clarity)
+# logging, datetime, os, functools are built-in — no install needed
+
+# Optional (for testing & development)
+pytest==8.3.2
+pytest-flask==1.3.0
