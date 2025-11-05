@@ -115,10 +115,7 @@
                         ${{ food.price }}
                         {% endif %}
                     </p>
-
-                    <a href="{{ url_for('order', food_id=food.food_id) }}">
-                        <button class="order-btn">Order Now</button>
-                    </a>
+                    <a href="{{ url_for('order', food_id=food.food_id) }}" class="order-btn">Order Now</a>
                 </div>
             </div>
             {% else %}
