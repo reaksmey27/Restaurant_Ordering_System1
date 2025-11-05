@@ -45,8 +45,9 @@
         <p><strong>Payment Date:</strong> {{ order.payment_date.strftime("%Y-%m-%d %H:%M") }}</p>
 
         <div class="button">
-            <a href="{{ url_for('order_list') }}" class="btn-back">🧾 Back to Orders</a>
-            <a href="{{ url_for('menu') }}" class="btn-pay">🍽 Back to Menu</a>
+            <a href="{{ url_for('order_list') }}" class="btn-back">Back to Orders</a>
+            <a href="{{ url_for('menu') }}" class="btn-pay">Back to Menu</a>
+            <a href="{{ url_for('download_payment_pdf', order_id=order.order_id) }}" class="btn-download">Download PDF</a>
         </div>
     </div>
 </body>

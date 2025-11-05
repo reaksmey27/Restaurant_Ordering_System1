@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, Response
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +6,9 @@ import os
 from datetime import datetime
 from functools import wraps
 import logging
+from io import BytesIO 
+from reportlab.lib.pagesizes import letter 
+from reportlab.pdfgen import canvas
 
 # ---------------- App Setup ----------------
 app = Flask(__name__)
@@ -326,7 +329,6 @@ def order_success(order_id):
 
 # ---------------- Receipt & Payment ----------------
 @app.route('/order/<int:order_id>/receipt')
-@login_required
 def view_receipt(order_id):
     cur = get_cursor()
     try:
@@ -572,6 +574,96 @@ def manage_orders():
         cursor.close()
 
     return render_template('manage_orders.html', orders=orders)
+
+# ✅ NEW PDF DOWNLOAD ROUTE
+@app.route('/order/<int:order_id>/payment/pdf')
+@login_required
+def download_payment_pdf(order_id):
+    from flask import make_response  # ensure imported at top
+
+    cur = get_cursor()
+    try:
+        cur.execute("""
+            SELECT o.*, f.food_name, f.image_url
+            FROM orders o
+            JOIN food f ON o.food_id = f.food_id
+            WHERE o.order_id = %s
+        """, (order_id,))
+        order = cur.fetchone()
+
+        if not order:
+            flash('Order not found.', 'error')
+            return redirect(url_for('order_list'))
+
+    finally:
+        cur.close()
+
+    # Create PDF in memory
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    pdf.setTitle(f"Payment Receipt #{order['order_id']}")
+
+    # Header
+    pdf.setFont("Helvetica-Bold", 18)
+    pdf.drawCentredString(300, 750, "✅ Payment Successful!")
+    pdf.setFont("Helvetica", 12)
+
+    y = 710
+    pdf.drawString(50, y, f"Order ID: {order['order_id']}")
+    y -= 20
+    pdf.drawString(50, y, f"Customer: {order['customer_name']}")
+    y -= 20
+    pdf.drawString(50, y, f"Phone: {order['phone']}")
+    y -= 20
+    pdf.drawString(50, y, f"Address: {order['address']}")
+    y -= 20
+    pdf.drawString(50, y, f"Delivery: {order['delivery_option']} via {order['delivery_service']}")
+
+    # Divider
+    y -= 30
+    pdf.line(50, y, 550, y)
+    y -= 30
+
+    # Table Header
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(50, y, "Food")
+    pdf.drawString(250, y, "Qty")
+    pdf.drawString(350, y, "Price")
+    pdf.drawString(450, y, "Total")
+    y -= 20
+
+    # Table Content
+    pdf.setFont("Helvetica", 12)
+    unit_price = order['total_price'] / order['quantity']
+    pdf.drawString(50, y, order['food_name'])
+    pdf.drawString(250, y, str(order['quantity']))
+    pdf.drawString(350, y, f"${unit_price:.2f}")
+    pdf.drawString(450, y, f"${order['total_price']:.2f}")
+
+    # Payment Info
+    y -= 40
+    pdf.line(50, y, 550, y)
+    y -= 30
+    pdf.drawString(50, y, f"Paid By: {order['payment_method']}")
+    y -= 20
+    pdf.drawString(50, y, f"Payment Date: {order['payment_date'].strftime('%Y-%m-%d %H:%M')}")
+
+    # Footer
+    pdf.setFont("Helvetica-Oblique", 12)
+    pdf.drawCentredString(300, 100, "Thank you for your payment! 🍕 Enjoy your meal!")
+
+    pdf.showPage()
+    pdf.save()
+
+    # Send file to user
+    pdf_out = buffer.getvalue()
+    buffer.close()
+
+    response = make_response(pdf_out)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=payment_receipt_{order_id}.pdf'
+
+    return response
 
 # ---------------- Run ----------------
 if __name__ == '__main__':
