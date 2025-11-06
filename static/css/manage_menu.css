@@ -25,7 +25,7 @@ nav {
 
 .nav-container {
     width: 90%;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: auto;
     display: flex;
     justify-content: space-between;
@@ -93,8 +93,8 @@ nav ul li a i {
 
 /* Dashboard Container */
 .dashboard-container {
-    width: 90%;
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1500px;
     margin: 40px auto;
     padding: 0 20px;
     animation: fadeIn 1s ease;
